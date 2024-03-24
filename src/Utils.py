@@ -1,20 +1,20 @@
-from oauthlib.oauth2    import BackendApplicationClient
-from requests_oauthlib  import OAuth2Session
+from oauthlib.oauth2 import BackendApplicationClient
+from requests_oauthlib import OAuth2Session
 import pandas as pd
 
 class Utils:
-    
     def __init__(self) -> None:
         pass
-    
-    def get_users(api : OAuth2Session, campus_id : int) -> pd.DataFrame:
+
+    @staticmethod
+    def get_users(api: OAuth2Session, campus_id: int) -> list:
         users = []
         page = 1
         while True:
             params = {'page': page, 'per_page': 100}
             response = api.get(f'https://api.intra.42.fr/v2/campus/{campus_id}/users', params=params)
             data = response.json()
-            
+
             if not data:
                 break
 
@@ -24,16 +24,16 @@ class Utils:
 
             page += 1
 
-        users.sort()
+        users = sorted(users)
 
         with open('users.txt', 'w') as users_txt:
             for user in users:
                 users_txt.write(user + '\n')
 
-        return sorted(users)
+        return users
 
     @staticmethod
-    def get_user_id(api : OAuth2Session, login : str, campus_id : int) -> int:
+    def get_user_id(api: OAuth2Session, login: str, campus_id: int) -> int:
         page = 1
         while True:
             params = {'page': page, 'per_page': 100}
@@ -46,7 +46,7 @@ class Utils:
             for user in users:
                 if user['login'] == login:
                     return user['id']
-            
+
             page += 1
 
         return None
