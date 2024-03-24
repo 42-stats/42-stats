@@ -44,8 +44,8 @@ class EvaluationData:
         loading_thread = threading.Thread(target=animation)
         loading_thread.start()
 
-        user_id = Utils.get_user_id(api=self.api, login=login, campus_id=53)
-        evals = self.get_evaluations(user_id, side)
+        user_id = Utils.get_user_id(api=self.api, login=login)
+        evals = self.get_evaluations(user_id=user_id, side=side)
 
         done.set()
         loading_thread.join()
@@ -54,5 +54,5 @@ class EvaluationData:
         average = evals['final_mark'].mean()
 
         os.system('clear')
-        result = average if side == 'as_corrected' else 100 - average
+        result = average if side == 'as_corrector' else 100 - average
         print(f'\rresult: {round(result, 2)}%\n')

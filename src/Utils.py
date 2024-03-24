@@ -33,20 +33,10 @@ class Utils:
         return users
 
     @staticmethod
-    def get_user_id(api: OAuth2Session, login: str, campus_id: int) -> int:
-        page = 1
-        while True:
-            params = {'page': page, 'per_page': 100}
-            response = api.get(f'https://api.intra.42.fr/v2/campus/{campus_id}/users', params=params)
-            users = response.json()
-
-            if not users:
-                break
-
-            for user in users:
-                if user['login'] == login:
-                    return user['id']
-
-            page += 1
-
-        return None
+    def get_user_id(api: OAuth2Session, login: str):
+        response = api.get(f'https://api.intra.42.fr/v2/users/{login}')
+        user = response.json()
+        id = user.get('id')
+        if not id:
+            return 0
+        return id
