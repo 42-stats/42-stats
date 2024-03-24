@@ -13,17 +13,18 @@ class CLInterface:
         except KeyboardInterrupt:
             return 1
 
-    def open_an_issue(self):
+    def open_an_issue(self) -> int:
         os.system('clear')
         print('\ropen an issue <3\n\nhttps://github.com/winstonallo/42-stats/issues\n')
         if request := self.prompt(['go back', 'quit']) == 'quit':
             return 1
         else:
             self.welcome_user()
-
+        return 0
     def prompt(self, options : list) -> str:
         terminal_menu = TerminalMenu(options)
-        if menu_entry_index := terminal_menu.show() is not None:
+        menu_entry_index = terminal_menu.show()
+        if menu_entry_index is not None:
             return options[menu_entry_index]
         return ""
 
@@ -33,13 +34,15 @@ class CLInterface:
         prompt = [	'average score as an evaluator',
         			'odds that you will fail your next project',
               		'i have another question']
-        if request := self.prompt(prompt) == 'i have another question':
+        request = self.prompt(prompt)
+        if request == 'i have another question':
             if self.open_an_issue() == 1:
                 return
         else:
             login = input('login: ')
             self.evaluation_data.get_eval_average(login=login, side='as_corrector' if request == 'average score as an evaluator' else 'as_corrected')
-            if request := self.prompt(['go back', 'quit']) == 'quit':
+            request = self.prompt(['go back', 'quit'])
+            if request == 'quit':
                 return
             else:
                 self.welcome_user()
