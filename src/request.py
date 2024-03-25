@@ -13,10 +13,10 @@ class Request:
 
         client_secret = os.getenv('API_SECRET')
         if client_secret is None:
-        	raise ValueError('error: .env variable "API_SECRET" not found')
+            raise ValueError('error: .env variable "API_SECRET" not found')
         client_id = os.getenv('API_UID')
         if client_id is None:
-        	raise ValueError('error: .env variable "API_UID" not found')
+            raise ValueError('error: .env variable "API_UID" not found')
         client = BackendApplicationClient(client_id=client_id)
         api = OAuth2Session(client=client)
 

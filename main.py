@@ -1,8 +1,8 @@
-from src.CLInterface    import CLInterface
+from src.CLInterface    import Interface
 
 def main():
     try:
-        CLInterface()
+        Interface()
     except Exception as e:
         print('\r\nunhandled error:', e, 'please open an issue at https://github.com/winstonallo/42-stats/issues')
         return 1

@@ -42,3 +42,24 @@ class Utils:
         if id is None:
             raise Exception('user not found')
         return id
+
+    @staticmethod
+    def get_evaluations(api: OAuth2Session, user_id : int, side : str) -> pd.DataFrame:
+
+        evaluations = []
+        page = 1
+
+        while True:
+
+            response = api.get(f'https://api.intra.42.fr/v2/users/{user_id}/scale_teams/{side}', params={'page': page, 'per_page': 100})
+            response.raise_for_status()
+            
+            data = response.json()
+            if not data:
+                break
+
+            evaluations.extend(data)
+            page += 1
+
+        df = pd.DataFrame(evaluations)
+        return df
