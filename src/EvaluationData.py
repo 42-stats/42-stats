@@ -1,11 +1,9 @@
 from src.Request            import Request
 from src.Utils              import Utils
 import threading
-import json
 import time
 import pandas as pd
-import sys
-import os
+from requests.exceptions import RequestException
 
 class EvaluationData:
 
@@ -17,22 +15,23 @@ class EvaluationData:
 
         evaluations = []
         page = 1
+
         while True:
-            params = {'page': page, 'per_page': 100}
-            response = self.api.get(f'https://api.intra.42.fr/v2/users/{user_id}/scale_teams/{side}', params=params)
+
+            response = self.api.get(f'https://api.intra.42.fr/v2/users/{user_id}/scale_teams/{side}', params={'page': page, 'per_page': 100})
+            response.raise_for_status()
+            
             data = response.json()
             if not data:
                 break
-            for evaluation in data:
-                evaluations.append(evaluation)
 
+            evaluations.extend(data)
             page += 1
 
         df = pd.DataFrame(evaluations)
-        df.to_json('evals.json', orient='records', lines=True, indent=4)
         return df
 
-    def get_eval_average(self, login : str, side : str) -> None:
+    def get_eval_average(self, login : str, side : str) -> str:
 
         def animation():
             chars = ['|', '/', '-', '\\']
@@ -42,14 +41,19 @@ class EvaluationData:
                 idx += 1
                 time.sleep(0.1)
 
-        user_id = Utils.get_user_id(api=self.api, login=login)
         
         done = threading.Event()
         loading_thread = threading.Thread(target=animation)
         loading_thread.start()
 
-        evals = self.get_evaluations(user_id=user_id, side=side)
-
+        try:
+            user_id = Utils.get_user_id(api=self.api, login=login)
+            evals = self.get_evaluations(user_id=user_id, side=side)
+        except Exception as e:
+            done.set()
+            loading_thread.join()
+            raise Exception(f'could not get evaluation average: {e}')
+        
         done.set()
         loading_thread.join()
 
@@ -57,8 +61,8 @@ class EvaluationData:
             evals = evals.dropna(subset=['final_mark'])
             average = evals['final_mark'].mean()
         except Exception as e:
-            print(f'{e}')
-            sys.exit(1)
-        os.system('clear')
+            raise Exception(f'{e}')
+
         result = average if side == 'as_corrector' else 100 - average
-        print(f'\rresult: {round(result, 2)}%\n')
+
+        return f'\rresult: {round(result, 2)}%\n'

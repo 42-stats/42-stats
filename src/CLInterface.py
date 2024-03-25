@@ -15,13 +15,22 @@ class CLInterface:
             self.evaluation_data = EvaluationData()
             self.welcome_user()
         except KeyboardInterrupt:
+            os.system('clear')
             sys.exit(1)
 
-    def open_an_issue(self) -> str:
+    def error(self, message: str):
+        self.logs.error(message)
+        if self.prompt(['go back', 'quit']) == 'quit':
+            sys.exit(0)
+        else:
+            self.welcome_user()
+
+    def show_result(self, result: str, clear : bool=True):
         os.system('clear')
-        print('\rfor feature requests, please open an issue: https://github.com/winstonallo/42-stats/issues\n')
+        print(f'\r{result}\n')
         request = self.prompt(['go back', 'quit'])
         if request == 'quit':
+            os.system('clear')
             sys.exit(0)
         else:
             self.welcome_user()
@@ -42,17 +51,17 @@ class CLInterface:
                     'quit']
         request = self.prompt(prompt)
         if request == 'quit':
+            os.system('clear')
             sys.exit(0)
         elif request == 'i have another question':
-            self.open_an_issue() == 'quit'
+            self.show_result('for feature requests, please open an issue: https://github.com/winstonallo/42-stats/issues')
         else:
             login = input('login: ')
+            result = ""
             try:
-                self.evaluation_data.get_eval_average(login=login, side='as_corrector' if request == 'average score as an evaluator' else 'as_corrected')
-            except ValueError as e:
-                self.logs.error(f' login not found in 42 network users: {e}')
-            request = self.prompt(['go back', 'quit'])
-            if request == 'quit':
-                return
-            else:
-                self.welcome_user()
+                result = self.evaluation_data.get_eval_average(login=login, side='as_corrector' if request == 'average score as an evaluator' else 'as_corrected')
+            except Exception as e:
+                self.error(f'\rerror: {e}')
+            self.show_result(result)
+            self.welcome_user()
+

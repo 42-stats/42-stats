@@ -34,11 +34,11 @@ class Utils:
 
     @staticmethod
     def get_user_id(api: OAuth2Session, login: str):
-        if len(login) < 3:
-            raise ValueError('login too short')
+        if not login or len(login) < 3:
+            raise Exception('user not found')
         response = api.get(f'https://api.intra.42.fr/v2/users/{login}')
         user = response.json()
         id = user.get('id')
         if id is None:
-            raise ValueError('user not found')
+            raise Exception('user not found')
         return id
