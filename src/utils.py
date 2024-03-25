@@ -1,4 +1,3 @@
-from oauthlib.oauth2 import BackendApplicationClient
 from requests_oauthlib import OAuth2Session
 import pandas as pd
 
@@ -7,7 +6,7 @@ class Utils:
         pass
 
     @staticmethod
-    def get_users(api: OAuth2Session, campus_id: int) -> list:
+    def get_active_users_for_campus(api: OAuth2Session, campus_id: int) -> list:
         users = []
         page = 1
         while True:
@@ -44,13 +43,11 @@ class Utils:
         return id
 
     @staticmethod
-    def get_evaluations(api: OAuth2Session, user_id : int, side : str) -> pd.DataFrame:
-
+    def get_evaluations_for_user(api: OAuth2Session, user_id: int, side: str) -> pd.DataFrame:
         evaluations = []
         page = 1
 
         while True:
-
             response = api.get(f'https://api.intra.42.fr/v2/users/{user_id}/scale_teams/{side}', params={'page': page, 'per_page': 100})
             response.raise_for_status()
             
@@ -63,3 +60,20 @@ class Utils:
 
         df = pd.DataFrame(evaluations)
         return df
+
+    @staticmethod
+    def get_teams_for_user(api: OAuth2Session, user_id: int) -> list:
+        teams = []
+        page = 1
+
+        while True:
+            response = api.get(f'https://api.intra.42.fr/v2/users/{user_id}/projects_users', params={'page': page, 'per_page': 100})
+            response.raise_for_status()
+
+            data = response.json()
+            if not data:
+                break
+            teams.extend(data)
+            page += 1
+        
+        return teams
