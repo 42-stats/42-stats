@@ -20,8 +20,9 @@ class CLInterface:
     def open_an_issue(self) -> str:
         os.system('clear')
         print('\rfor feature requests, please open an issue: https://github.com/winstonallo/42-stats/issues\n')
-        if request := self.prompt(['go back', 'quit']) == 'quit':
-            return 'quit'
+        request = self.prompt(['go back', 'quit'])
+        if request == 'quit':
+            sys.exit(0)
         else:
             self.welcome_user()
         return 0
@@ -39,9 +40,11 @@ class CLInterface:
         			'odds that you will fail your next project',
               		'i have another question',
                     'quit']
-        if request := self.prompt(prompt) == 'i have another question':
-            if self.open_an_issue() == 'quit':
-                return
+        request = self.prompt(prompt)
+        if request == 'quit':
+            sys.exit(0)
+        elif request == 'i have another question':
+            self.open_an_issue() == 'quit'
         else:
             login = input('login: ')
             try:

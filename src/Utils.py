@@ -38,6 +38,7 @@ class Utils:
             raise ValueError('login too short')
         response = api.get(f'https://api.intra.42.fr/v2/users/{login}')
         user = response.json()
-        if id := user.get('id') is None:
+        id = user.get('id')
+        if id is None:
             raise ValueError('user not found')
         return id

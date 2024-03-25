@@ -1,9 +1,10 @@
 from src.Request            import Request
 from src.Utils              import Utils
 import threading
+import json
 import time
 import pandas as pd
-import math
+import sys
 import os
 
 class EvaluationData:
@@ -28,6 +29,7 @@ class EvaluationData:
             page += 1
 
         df = pd.DataFrame(evaluations)
+        df.to_json('evals.json', orient='records', lines=True, indent=4)
         return df
 
     def get_eval_average(self, login : str, side : str) -> None:
@@ -51,9 +53,12 @@ class EvaluationData:
         done.set()
         loading_thread.join()
 
-        evals = evals.dropna(subset=['final_mark'])
-        average = evals['final_mark'].mean()
-
+        try:
+            evals = evals.dropna(subset=['final_mark'])
+            average = evals['final_mark'].mean()
+        except Exception as e:
+            print(f'{e}')
+            sys.exit(1)
         os.system('clear')
         result = average if side == 'as_corrector' else 100 - average
         print(f'\rresult: {round(result, 2)}%\n')
