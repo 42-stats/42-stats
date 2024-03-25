@@ -40,11 +40,12 @@ class EvaluationData:
                 idx += 1
                 time.sleep(0.1)
 
+        user_id = Utils.get_user_id(api=self.api, login=login)
+        
         done = threading.Event()
         loading_thread = threading.Thread(target=animation)
         loading_thread.start()
 
-        user_id = Utils.get_user_id(api=self.api, login=login)
         evals = self.get_evaluations(user_id=user_id, side=side)
 
         done.set()

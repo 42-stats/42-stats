@@ -1,23 +1,27 @@
 from simple_term_menu   import TerminalMenu
 from src.EvaluationData     import EvaluationData
 import os
+import logging
+import sys
 
-welcome_message = '\rabied-ch: what would you like to know?\n'
+logging.basicConfig(level=logging.WARNING)
+welcome_message = '\rwhat would you like to know?\n'
 
 class CLInterface:
 
     def __init__(self):
+        self.logs = logging.getLogger('logs')
         try:
             self.evaluation_data = EvaluationData()
             self.welcome_user()
         except KeyboardInterrupt:
-            return 1
+            sys.exit(1)
 
-    def open_an_issue(self) -> int:
+    def open_an_issue(self) -> str:
         os.system('clear')
-        print('\ropen an issue <3\n\nhttps://github.com/winstonallo/42-stats/issues\n')
+        print('\rfor feature requests, please open an issue: https://github.com/winstonallo/42-stats/issues\n')
         if request := self.prompt(['go back', 'quit']) == 'quit':
-            return 1
+            return 'quit'
         else:
             self.welcome_user()
         return 0
@@ -33,14 +37,17 @@ class CLInterface:
         print(welcome_message)
         prompt = [	'average score as an evaluator',
         			'odds that you will fail your next project',
-              		'i have another question']
-        request = self.prompt(prompt)
-        if request == 'i have another question':
-            if self.open_an_issue() == 1:
+              		'i have another question',
+                    'quit']
+        if request := self.prompt(prompt) == 'i have another question':
+            if self.open_an_issue() == 'quit':
                 return
         else:
             login = input('login: ')
-            self.evaluation_data.get_eval_average(login=login, side='as_corrector' if request == 'average score as an evaluator' else 'as_corrected')
+            try:
+                self.evaluation_data.get_eval_average(login=login, side='as_corrector' if request == 'average score as an evaluator' else 'as_corrected')
+            except ValueError as e:
+                self.logs.error(f' login not found in 42 network users: {e}')
             request = self.prompt(['go back', 'quit'])
             if request == 'quit':
                 return

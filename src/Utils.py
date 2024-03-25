@@ -34,9 +34,10 @@ class Utils:
 
     @staticmethod
     def get_user_id(api: OAuth2Session, login: str):
+        if len(login) < 3:
+            raise ValueError('login too short')
         response = api.get(f'https://api.intra.42.fr/v2/users/{login}')
         user = response.json()
-        id = user.get('id')
-        if not id:
-            return 0
+        if id := user.get('id') is None:
+            raise ValueError('user not found')
         return id
