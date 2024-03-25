@@ -43,7 +43,7 @@ python3 main.py
 Follow the on-screen prompts to navigate through the different options.
 
 ## 🍰 Contributing    
-I suck at Python, contributions are welcome! If you have a suggestion for improving this tool or have found a bug, please open an issue on the repository.
+Contributions are welcome! If you have a suggestion for improving this tool or have found a bug, please open an issue on the repository.
 
 Additionally, if you would like to contribute code, please fork the repo and submit a pull request.
 
