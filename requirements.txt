@@ -1,5 +1,7 @@
+googletrans==4.0.0rc1
 oauthlib==3.2.2
 pandas==2.2.1
 python-dotenv==1.0.1
 requests_oauthlib==2.0.0
 simple_term_menu==1.6.4
+textblob==0.18.0.post0
