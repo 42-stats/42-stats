@@ -60,6 +60,7 @@ class Interface:
         os.system('clear')
         print(f'\r{result}')
         if self.prompt(['go back', 'quit']) == 'quit':
+            os.system('clear')
             sys.exit(0)
         else:
             self.welcome_user()
