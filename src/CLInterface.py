@@ -44,7 +44,7 @@ class Interface:
 
         if menu_entry_index is None:
             print("Bye")
-            exit(0)
+            sys.exit(0)
 
         return options[menu_entry_index]
 
