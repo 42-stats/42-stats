@@ -5,10 +5,9 @@ import threading
 from textblob import TextBlob
 from googletrans    import Translator, LANGUAGES
 
-
 class FeedbackAnalyzer(BaseModule):
 
-    def translate_to_english(self, comments):
+    def translate_to_english(self, comments) -> list:
         done_event = threading.Event()
         loading_thread = start_animation(done_event, 'translating comments')
         translator = Translator()
@@ -34,7 +33,7 @@ class FeedbackAnalyzer(BaseModule):
         return translated_comments
 
 
-    def run(self):
+    def run(self) -> str:
         print('\rwarning: shitty feature lol')
         print('\rdo very basic natural language processing to make a list of the negative comments you have received after being evaluated\n')
         side = self.prompt(['as corrector?', 'as corrected?'])
