@@ -1,6 +1,6 @@
 # <p align="center">42 Stats </p>
   
-The 42 Stats CLI is a command-line tool designed for students designed for 42 students. It allows users to easily access and analyze various statistics related to their curriculum.
+The 42 Stats CLI is a command-line tool designed for 42 students. It allows users to easily access and analyze various statistics related to their curriculum.
 ## 🧐 Features    
 - **Average Score as an evaluator:** Get the average score you've given as an evaluator
 - **Odds of failing your next project:** Estimate the likelihood of not passing your next project
