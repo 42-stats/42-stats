@@ -51,18 +51,25 @@ class Interface:
     def welcome_user(self) -> None:
         os.system("clear")
         print(welcome_message)
+
         options = list(self.modules.keys()) + ["quit"]
         request = self.prompt(options)
-        result = ""
-        if request in self.modules:
-            try:
-                result = self.modules[request].run()
-            except Exception as e:
-                self.error(f"\rerror: {e}")
-            self.show_result(result=result)
-        elif request == "quit":
+
+        if request == "quit":
             os.system("clear")
             sys.exit(0)
+
+        if request not in self.modules:
+            print(
+                f"Error: Non existent module selected (this should not happen): ${request}"
+            )
+            sys.exit(0)
+
+        try:
+            result = self.modules[request].run()
+            self.show_result(result=result)
+        except Exception as e:
+            self.error(f"\rerror: {e}")
 
     def show_result(self, result: str):
         os.system("clear")
