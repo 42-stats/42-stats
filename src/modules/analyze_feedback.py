@@ -35,19 +35,23 @@ class FeedbackAnalyzer(BaseModule):
 
 
     def run(self):
-        login = input('login: ')
-        
+        print('\rwarning: shitty feature lol')
+        print('\rdo very basic natural language processing to make a list of the negative comments you have received after being evaluated\n')
+        side = self.prompt(['as corrector?', 'as corrected?'])
+        login = input('\rlogin: ')
+        side = side.replace(' ', '_')
         try:
             done_event = threading.Event()
             loading_thread = start_animation(done_event, 'fetching data')
-            teams = Utils.get_evaluations_for_user(self.api, Utils.get_user_id(self.api, login), side='as_corrected')
+            teams = Utils.get_evaluations_for_user(self.api, Utils.get_user_id(self.api, login), side=side)
         except Exception as e:
             return f'error: {e}'
         finally:
             done_event.set()
             loading_thread.join()
         
-        comments = self.translate_to_english(teams['comment'])
+        # comments = self.translate_to_english(teams['comment'])
+        comments = teams['comment']
         negative_comments = []
         done_event = threading.Event()
         loading_thread = start_animation(done_event, 'analyzing comments')
