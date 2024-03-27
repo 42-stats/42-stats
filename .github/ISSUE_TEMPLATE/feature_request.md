@@ -1,19 +1,38 @@
----
-name: Feature request
-about: Suggest an idea for this project
-title: "[FEATURE]"
-labels: ''
-assignees: ''
+name: Feature Request
+description: Suggest an idea for this project
+title: '[Feat]: '
+labels: ['enhancement']
 
----
+body:
+  - type: markdown
+    attributes:
+      value: |
+        We are working hard on the project, but we cannot think about everything. That's where you come into the game! We appreciate all feedback and feature requests!
 
-## Is your feature request related to a problem? Please describe.
-Description of what the problem is
+  - type: textarea
+    attributes:
+      label: Is your feature request related to a problem you are experiencing?
+      description: Provide as much information as possible.
+    validations:
+      required: true
 
-## Describe the solution you'd like
-Description of what you want to happen.
+  - type: textarea
+    attributes:
+      label: Describe the solution you would like.
+      description: A clear and concise description of what you want to happen.
+    validations:
+      required: true
 
-## Describe alternatives you've considered
-Alternative solutions
+  - type: textarea
+    attributes:
+      label: Describe alternatives you have considered.
+      description: A clear and concise description of any alternative solutions or features you have considered.
+    validations:
+      required: true
 
-**Additional context**
+  - type: textarea
+    attributes:
+      label: Additional Context.
+      description: Add any other information, or screenshot about your feature request.
+    validations:
+      required: false
