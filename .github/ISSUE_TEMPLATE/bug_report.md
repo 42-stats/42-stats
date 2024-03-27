@@ -1,0 +1,65 @@
+name: Bug Report
+description: Found a bug? Help us finding it!
+title: "[Bug]: "
+labels: ["bug"]
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for helping us to find bugs! Please take time creating it, so we can fix it asap. 🙏
+  
+  - type: input
+    id: python-version
+    attributes:
+      label: Python Version.
+      description: What Python version are you using? For example you can get the version with `python --version`.
+      placeholder: Python 3.10.12
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: 42-stats-version
+    attributes:
+      label: 42 Stats Version.
+      description: Are you running the latest version of 42 Stats? Double check by running `git pull` on the main branch.
+      options:
+        - label: I am using the latest version.
+          required: true
+          
+  - type: textarea
+    id: bug-description
+    attributes:
+      label: Describe the bug.
+      description: Please describe us what unexpected behaviour you are experiencing.
+    validations:
+      required: true
+
+  - type: textarea
+    id: bug-expectation
+    attributes:
+      label: What should have happened?
+      description: If the bug would not exist, what should have happened?
+    validations:
+      required: true
+
+  - type: textarea
+    id: bug-reproduction
+    attributes:
+      label: Steps to reproduce the bug.
+      description: Provide us, a simple list of steps we can take to to reproduce this bug.
+      value: |
+        1.
+        2.
+        3.
+        4.
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional context.
+      description: Do you want to share any additional information?
+    validations:
+      required: true
