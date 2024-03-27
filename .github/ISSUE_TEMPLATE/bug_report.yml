@@ -8,7 +8,7 @@ body:
     attributes:
       value: |
         Thank you for helping us to find bugs! Please take time creating it, so we can fix it asap. 🙏
-  
+
   - type: input
     id: python-version
     attributes:
@@ -26,7 +26,7 @@ body:
       options:
         - label: I am using the latest version.
           required: true
-          
+
   - type: textarea
     id: bug-description
     attributes:
