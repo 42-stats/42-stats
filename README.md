@@ -52,7 +52,6 @@ Additionally, if you would like to contribute code, please fork the repo and sub
 3.    **Commit and push your changes**
 4.    **Open a pull request**
                 
-## 🙇 Author
-#### Arthur Bied-Charreton
-- Github: [@winstonallo](https://github.com/winstonallo)
-- LinkedIn: [Arthur Bied-Charreton](https://www.linkedin.com/in/arthur-bied-charreton/)
+## 🙇 Authors
+- [@ifaoji](https://github.com/ifaoji)
+- [@winstonallo](https://github.com/winstonallo)
