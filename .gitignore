@@ -1,0 +1,8 @@
+# Configuration
+.env
+
+# Python
+__pycache__
+
+# Editor
+.vscode

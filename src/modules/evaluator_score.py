@@ -4,6 +4,7 @@ import threading
 from src.animation_utils import Animation
 
 
+
 class EvaluatorScore(BaseModule):
 
     def run(self) -> str:

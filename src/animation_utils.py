@@ -2,6 +2,7 @@ import threading
 import time
 
 
+
 class Animation:
 
     def __init__(self, message: str):
@@ -28,3 +29,4 @@ class Animation:
     def stop_animation(self):
         self.done_event.set()
         self.loading_thread.join()
+

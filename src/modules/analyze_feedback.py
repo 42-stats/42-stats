@@ -11,6 +11,7 @@ class FeedbackAnalyzer(BaseModule):
     def translate_to_english(self, comments) -> list:
         done_event = threading.Event()
         loading_animation = Animation("Translating comments")
+        translator = Translator()
         translated_comments = []
 
         for comment in comments:
@@ -48,6 +49,7 @@ class FeedbackAnalyzer(BaseModule):
             return f"error: {e}"
         finally:
             loading_animation.stop_animation()
+
 
         # comments = self.translate_to_english(teams['comment'])
         comments = teams["comment"]

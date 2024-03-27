@@ -43,6 +43,11 @@ class Interface:
     def prompt(self, options: list) -> str:
         terminal_menu = TerminalMenu(options)
         menu_entry_index = terminal_menu.show()
+
+        if menu_entry_index is None:
+            print("Bye")
+            sys.exit(0)
+
         return options[menu_entry_index]
 
     def welcome_user(self) -> None:
