@@ -50,7 +50,6 @@ class FeedbackAnalyzer(BaseModule):
         finally:
             loading_animation.stop_animation()
 
-
         # comments = self.translate_to_english(teams['comment'])
         comments = teams["comment"]
         negative_comments = []
