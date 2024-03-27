@@ -35,7 +35,7 @@ class FeedbackAnalyzer(BaseModule):
     def run(self) -> str:
         print("\rwarning: shitty feature lol")
         print(
-            "\rdo very basic natural language processing to make a list of the negative comments you have received after being evaluated\n"
+            "\rDo (very) basic language processing to list the negative comments you have received\n"
         )
         side = self.prompt(["as corrector?", "as corrected?"])
         login = input("\rlogin: ")
