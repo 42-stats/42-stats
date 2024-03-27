@@ -42,5 +42,4 @@ class Request:
             )
 
             sys.exit(1)
-
         return api

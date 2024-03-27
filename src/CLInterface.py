@@ -3,6 +3,7 @@ from src.modules.evaluator_score import EvaluatorScore
 from src.modules.odds_of_failing import OddsOfFailing
 from src.modules.feature_request import FeatureRequest
 from src.modules.analyze_feedback import FeedbackAnalyzer
+from src.modules.friends_evals import FriendsEval
 from src.request import Request
 import os
 import logging
@@ -21,8 +22,9 @@ class Interface:
         self.modules = {
             "average score as an evaluator": EvaluatorScore(self.api),
             "odds of failing next project": OddsOfFailing(self.api),
-            "i have another question": FeatureRequest(self.api),
             "analyze my weaknesses": FeedbackAnalyzer(self.api),
+            "evaluation network analysis": FriendsEval(self.api),
+            "i have another question": FeatureRequest(self.api),
         }
         try:
             self.welcome_user()
@@ -74,7 +76,7 @@ class Interface:
     def show_result(self, result: str):
         os.system("clear")
         print(f"\r{result}")
-        if self.prompt(["go back", "quit"]) == "quit":
+        if result != "skip" and self.prompt(["go back", "quit"]) == "quit":
             os.system("clear")
             sys.exit(0)
         else:
