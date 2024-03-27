@@ -1,6 +1,6 @@
 from src.modules.base import BaseModule
 from src.utils import Utils
-from src.animation_utils import start_animation
+from src.animation_utils import Animation
 import threading
 from textblob import TextBlob
 from googletrans import Translator, LANGUAGES
@@ -10,17 +10,16 @@ class FeedbackAnalyzer(BaseModule):
 
     def translate_to_english(self, comments) -> list:
         done_event = threading.Event()
-        loading_thread = start_animation(done_event, "translating comments")
-        translator = Translator()
+        loading_animation = Animation("Translating comments")
         translated_comments = []
 
         for comment in comments:
             if comment is None:
                 continue
             try:
-                detected = translator.detect(comment)
+                detected = Translator.detect(comment)
                 if LANGUAGES[detected.lang] != "en":
-                    translated_comment = translator.translate(comment, dest="en").text
+                    translated_comment = Translator.translate(comment, dest="en").text
                     translated_comments.append(translated_comment)
                 else:
                     translated_comments.append(comment)
@@ -28,8 +27,7 @@ class FeedbackAnalyzer(BaseModule):
                 self.logs.error(f"\rtranslation error: {e}")
                 translated_comments.append(comment)
 
-        done_event.set()
-        loading_thread.join()
+        loading_animation.stop_animation()
 
         return translated_comments
 
@@ -42,22 +40,19 @@ class FeedbackAnalyzer(BaseModule):
         login = input("\rlogin: ")
         side = side.replace(" ", "_")
         try:
-            done_event = threading.Event()
-            loading_thread = start_animation(done_event, "fetching data")
+            loading_animation = Animation(f"Fetching evaluation for user: {login}")
             teams = Utils.get_evaluations_for_user(
                 self.api, Utils.get_user_id(self.api, login), side=side
             )
         except Exception as e:
             return f"error: {e}"
         finally:
-            done_event.set()
-            loading_thread.join()
+            loading_animation.stop_animation()
 
         # comments = self.translate_to_english(teams['comment'])
         comments = teams["comment"]
         negative_comments = []
-        done_event = threading.Event()
-        loading_thread = start_animation(done_event, "analyzing comments")
+        loading_animation = Animation("Analyzing comments")
         positive, neutral, negative = 0, 0, 0
         for comment in comments:
             blob = TextBlob(comment)
@@ -68,7 +63,6 @@ class FeedbackAnalyzer(BaseModule):
             else:
                 negative += 1
                 negative_comments.append(comment)
-        done_event.set()
-        loading_thread.join()
+        loading_animation.stop_animation()
         formatted_negative_comments = "\n-\n".join(negative_comments)
         return f"{len(negative_comments)} negative comments found:\n-\n{formatted_negative_comments}"

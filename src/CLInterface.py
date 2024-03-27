@@ -23,7 +23,7 @@ class Interface:
             "average score as an evaluator": EvaluatorScore(self.api),
             "odds of failing next project": OddsOfFailing(self.api),
             "analyze my weaknesses": FeedbackAnalyzer(self.api),
-            "am i a cheater?": FriendsEval(self.api),
+            "evaluation network analysis": FriendsEval(self.api),
             "i have another question": FeatureRequest(self.api),
         }
         try:
@@ -64,7 +64,7 @@ class Interface:
     def show_result(self, result: str):
         os.system("clear")
         print(f"\r{result}")
-        if self.prompt(["go back", "quit"]) == "quit":
+        if result != "skip" and self.prompt(["go back", "quit"]) == "quit":
             os.system("clear")
             sys.exit(0)
         else:

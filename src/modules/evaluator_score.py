@@ -1,15 +1,16 @@
 from src.modules.base import BaseModule
 from src.utils import Utils
 import threading
-from src.animation_utils import start_animation
+from src.animation_utils import Animation
 
 
 class EvaluatorScore(BaseModule):
 
     def run(self) -> str:
         login = input("login: ")
-        done_event = threading.Event()
-        loading_thread = start_animation(done_event, "fetching data")
+        loading_animation = Animation(
+            f"Fetching evaluations involving {login} as a corrector"
+        )
 
         try:
             user_id = Utils.get_user_id(api=self.api, login=login)
@@ -23,7 +24,6 @@ class EvaluatorScore(BaseModule):
         except Exception as e:
             return_message = f"error: {e}"
         finally:
-            done_event.set()
-            loading_thread.join()
+            loading_animation.stop_animation()
 
         return return_message

@@ -1,6 +1,7 @@
 from requests_oauthlib import OAuth2Session
 import pandas as pd
 import json
+import time
 
 
 class Utils:
@@ -54,7 +55,8 @@ class Utils:
         page = 1
 
         while True:
-            response = api.get(
+            response = Utils.make_request_with_backoff(
+                api,
                 f"https://api.intra.42.fr/v2/users/{user_id}/scale_teams/{side}",
                 params={"page": page, "per_page": 100},
             )
@@ -78,7 +80,8 @@ class Utils:
         page = 1
 
         while True:
-            response = api.get(
+            response = Utils.make_request_with_backoff(
+                api,
                 f"https://api.intra.42.fr/v2/users/{user_id}/projects_users",
                 params={"page": page, "per_page": 100},
             )
@@ -91,3 +94,18 @@ class Utils:
             page += 1
 
         return teams
+
+    @staticmethod
+    def make_request_with_backoff(
+        api: OAuth2Session, url: str, params: dict, max_retries: int = 5
+    ):
+        retry_wait = 1
+        for attempt in range(max_retries):
+            response = api.get(url, params=params)
+            if response.status_code == 429:
+                print(f"Rate limit hit, retrying in {retry_wait} seconds...")
+                time.sleep(retry_wait)
+                retry_wait *= 2
+            else:
+                return response
+        raise Exception(f"Request {url} failed after max retries")
