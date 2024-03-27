@@ -23,16 +23,15 @@ class FriendsEval(BaseModule):
     ) -> str:
         formatted_lines = []
         for line in range(total_lines):
-            for line in range(total_lines):
-                line_entries = []
-                for i in range(entries_per_line):
-                    index = line * entries_per_line + i
-                    if index < total_entries:
-                        login, count = sorted_counts[index]
-                        if len(login) < 5:
-                            login += "  "
-                        line_entries.append(f"{login}: {count}")
-                formatted_lines.append("\t".join(line_entries))
+            line_entries = []
+            for i in range(entries_per_line):
+                index = line * entries_per_line + i
+                if index < total_entries:
+                    login, count = sorted_counts[index]
+                    if len(login) < 5:
+                        login += "  "
+                    line_entries.append(f"{login}: {count}")
+            formatted_lines.append("\t".join(line_entries))
         return "\n".join(formatted_lines)
 
     def format_result(
