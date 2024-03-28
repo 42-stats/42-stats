@@ -11,4 +11,4 @@ __pycache__
 *.json
 
 # Training
-models/*
+src/training/models/feedback_analysis_finetuned_BERT
