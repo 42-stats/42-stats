@@ -55,20 +55,28 @@ class BertClassifier(nn.Module):
 
 
 class Trainer:
-    def __init__(self):
+    def __init__(self, pre_trained_model_path=None):
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        self.init_model()
+        self.init_model(pre_trained_model_path)
         pass
 
-    def init_model(self):
+    def init_model(self, pre_trained_model_path=None):
         bert_model = BertModel.from_pretrained("bert-base-uncased")
         self.model = BertClassifier(bert_model, num_labels=5).to(self.device)
+
+        if pre_trained_model_path is not None:
+            self.model.load_state_dict(
+                torch.load(pre_trained_model_path, map_location=self.device)
+            )
+            print(f"loaded model weights from {pre_trained_model_path}")
 
         criterion = nn.CrossEntropyLoss()
         optimizer = optim.AdamW(self.model.parameters(), lr=2e-5)
 
-        train_dataset = FeedbackDataset("training/feedback_training.csv")
-        test_dataset = FeedbackDataset("training/feedback_test.csv")
+        train_dataset = FeedbackDataset(
+            "src/training/training_data/feedback_training.csv"
+        )
+        test_dataset = FeedbackDataset("src/training/training_data/feedback_test.csv")
 
         train_loader = DataLoader(train_dataset, batch_size=16, shuffle=True)
         test_loader = DataLoader(test_dataset, batch_size=16)
@@ -76,6 +84,7 @@ class Trainer:
         for epoch in range(3):
             self.train(train_loader, optimizer, criterion)
             self.evaluate(test_loader, criterion)
+        self.save_model()
 
     def train(self, train_loader, optimizer, criterion):
         self.model.train()
@@ -109,5 +118,11 @@ class Trainer:
             f"Test loss: {total_loss / len(test_loader)}, Test acc: {total_acc / len(test_loader.dataset) * 100}%"
         )
 
+    def save_model(
+        self, save_path="src/training/models/feedback_analysis_finetuned_BERT"
+    ):
+        torch.save(self.model.state_dict(), save_path)
+        print(f"Model saved to {save_path}")
 
-Trainer()
+
+Trainer("src/training/models/feedback_analysis_finetuned_BERT")
