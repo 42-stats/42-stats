@@ -50,10 +50,10 @@ class FeedbackAnalyzer(BaseModule):
         negative_comments = []
         try:
             loading_animation = Animation(f"\rAnalyzing comments for user: {login}")
-            sentiment_pipeline = pipeline(
-                model="DT12the/distilbert-sentiment-analysis"
+            sentiment_pipeline = pipeline(model="DT12the/distilbert-sentiment-analysis")
+            result = list(
+                zip(sentiment_pipeline(list(teams["comment"])), teams["comment"])
             )
-            result = list(zip(sentiment_pipeline(list(teams["comment"])), teams["comment"]))
             with open("sentiments.json", "w") as sentiments_file:
                 json.dump(result, sentiments_file, indent=4)
         except Exception as e:
