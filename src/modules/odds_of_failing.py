@@ -8,7 +8,6 @@ class OddsOfFailing(BaseModule):
 
     def run(self) -> str:
         login = input("login: ")
-        done_event = threading.Event()
         loading_animation = Animation(f"Fetching groups for {login}")
 
         try:

@@ -9,9 +9,7 @@ from googletrans import Translator, LANGUAGES
 class FeedbackAnalyzer(BaseModule):
 
     def translate_to_english(self, comments) -> list:
-        done_event = threading.Event()
         loading_animation = Animation("Translating comments")
-        translator = Translator()
         translated_comments = []
 
         for comment in comments:
