@@ -64,8 +64,8 @@ class Trainer:
         criterion = nn.CrossEntropyLoss()
         optimizer = optim.AdamW(self.model.parameters(), lr=2e-5)
 
-        train_dataset = FeedbackDataset("feedback_training.csv")
-        test_dataset = FeedbackDataset("feedback_test.csv")
+        train_dataset = FeedbackDataset("training/feedback_training.csv")
+        test_dataset = FeedbackDataset("training/feedback_test.csv")
 
         train_loader = DataLoader(train_dataset, batch_size=16, shuffle=True)
         test_loader = DataLoader(test_dataset, batch_size=16)
