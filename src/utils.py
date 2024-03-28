@@ -30,10 +30,6 @@ class Utils:
 
         users = sorted(users)
 
-        with open("users.txt", "w") as users_txt:
-            for user in users:
-                users_txt.write(user + "\n")
-
         return users
 
     @staticmethod
