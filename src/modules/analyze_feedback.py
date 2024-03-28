@@ -5,6 +5,7 @@ from transformers import pipeline
 from googletrans import Translator, LANGUAGES
 import json
 
+
 class FeedbackAnalyzer(BaseModule):
 
     def translate_to_english(self, comments) -> list:
@@ -49,9 +50,11 @@ class FeedbackAnalyzer(BaseModule):
         negative_comments = []
         try:
             loading_animation = Animation(f"\rAnalyzing comments for user: {login}")
-            sentiment_pipeline = pipeline(model="juliensimon/reviews-sentiment-analysis")
+            sentiment_pipeline = pipeline(
+                model="juliensimon/reviews-sentiment-analysis"
+            )
             result = sentiment_pipeline(list(teams["comment"]))
-            with open('sentiments.json', 'w') as sentiments_file:
+            with open("sentiments.json", "w") as sentiments_file:
                 json.dump(result, sentiments_file, indent=4)
         except Exception as e:
             return f"error: {e}"
