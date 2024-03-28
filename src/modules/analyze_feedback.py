@@ -1,17 +1,14 @@
 from src.modules.base import BaseModule
 from src.utils import Utils
 from src.animation_utils import Animation
-import threading
-from textblob import TextBlob
+from transformers import pipeline
 from googletrans import Translator, LANGUAGES
-
+import json
 
 class FeedbackAnalyzer(BaseModule):
 
     def translate_to_english(self, comments) -> list:
-        done_event = threading.Event()
         loading_animation = Animation("Translating comments")
-        translator = Translator()
         translated_comments = []
 
         for comment in comments:
@@ -37,11 +34,10 @@ class FeedbackAnalyzer(BaseModule):
         print(
             "\rDo (very) basic language processing to list the negative comments you have received\n"
         )
-        side = self.prompt(["as corrector?", "as corrected?"])
+        side = self.prompt(["as corrector?", "as corrected?"]).replace(" ", "_")
         login = input("\rlogin: ")
-        side = side.replace(" ", "_")
         try:
-            loading_animation = Animation(f"Fetching evaluation for user: {login}")
+            loading_animation = Animation(f"\rFetching evaluations for user: {login}")
             teams = Utils.get_evaluations_for_user(
                 self.api, Utils.get_user_id(self.api, login), side=side
             )
@@ -50,20 +46,16 @@ class FeedbackAnalyzer(BaseModule):
         finally:
             loading_animation.stop_animation()
 
-        # comments = self.translate_to_english(teams['comment'])
-        comments = teams["comment"]
         negative_comments = []
-        loading_animation = Animation("Analyzing comments")
-        positive, neutral, negative = 0, 0, 0
-        for comment in comments:
-            blob = TextBlob(comment)
-            if blob.sentiment.polarity > 0:
-                positive += 1
-            elif blob.sentiment.polarity == 0:
-                neutral += 1
-            else:
-                negative += 1
-                negative_comments.append(comment)
-        loading_animation.stop_animation()
+        try:
+            loading_animation = Animation(f"\rAnalyzing comments for user: {login}")
+            sentiment_pipeline = pipeline(model="juliensimon/reviews-sentiment-analysis")
+            result = sentiment_pipeline(list(teams["comment"]))
+            with open('sentiments.json', 'w') as sentiments_file:
+                json.dump(result, sentiments_file, indent=4)
+        except Exception as e:
+            return f"error: {e}"
+        finally:
+            loading_animation.stop_animation()
         formatted_negative_comments = "\n-\n".join(negative_comments)
         return f"{len(negative_comments)} negative comments found:\n-\n{formatted_negative_comments}"
