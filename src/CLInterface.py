@@ -6,12 +6,15 @@ from src.utils import clear_terminal
 
 
 class Interface:
-    def __init__(self, title: str, modules: dict[str, BaseModule]):
+    def __init__(self, title: str, modules: dict[str, BaseModule], can_go_back=False):
+        self.can_go_back = can_go_back
         self.title = title
         self.modules = modules
 
     def loop(self):
         options = list(self.modules.keys())
+        if self.can_go_back:
+            options.append("go back")
         options.append("quit")
 
         while True:
@@ -25,6 +28,9 @@ class Interface:
                 print("Bye")
                 sys.exit(0)
 
+            if self.can_go_back and selection == "go back":
+                return
+
             if selection not in self.modules:
                 print(
                     f"Error: Non existent module selected (this should not happen): {selection}"
@@ -34,6 +40,10 @@ class Interface:
             try:
                 # TODO: The module should print the result itself
                 result = self.modules[selection].run()
+
+                if result is None:
+                    continue
+
                 self.show_result(result)
             except Exception as error:
                 self.error(error)
