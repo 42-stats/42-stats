@@ -1,3 +1,4 @@
+import logging
 from simple_term_menu import TerminalMenu
 from src.modules.base import BaseModule
 import sys
@@ -10,6 +11,7 @@ class Interface:
         self.can_go_back = can_go_back
         self.title = title
         self.modules = modules
+        self.logs = logging.getLogger("logs")
 
     def loop(self):
         options = list(self.modules.keys())
@@ -59,10 +61,7 @@ class Interface:
             sys.exit(0)
 
     def error(self, error: Exception):
-        # TODO: logger error?
-        print("We have encountered an unhandled error:")
-        print(error)
-        print()
+        self.logs.error(f"We have encountered an unhandled error:\n{error}\n")
 
         if self.prompt(["continue", "quit"]) == "continue":
             return
