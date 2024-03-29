@@ -1,4 +1,5 @@
 import os
+from typing import Optional
 from requests_oauthlib import OAuth2Session
 import pandas as pd
 import json
@@ -7,7 +8,8 @@ import time
 
 def clear_terminal():
     # Since Windows likes to be special the command is `cls` and not `clear`
-    os.system("cls" if os.name == "nt" else "clear")
+    # os.system("cls" if os.name == "nt" else "clear")
+    return
 
 
 class Utils:
@@ -41,6 +43,51 @@ class Utils:
                 users_txt.write(user + "\n")
 
         return users
+
+    @staticmethod
+    def get_users(
+        api: OAuth2Session,
+        cursus_id: Optional[str | int] = None,
+        pool_year: Optional[str | int] = None,
+        pool_month: Optional[str | int] = None,
+        primary_campus_id: Optional[str | int] = None,
+    ) -> list:
+        users = []
+
+        params = {"per_page": 100}
+
+        if cursus_id is not None:
+            params["cursus_id"] = cursus_id
+
+        if pool_year is not None:
+            params["filter[pool_year]"] = pool_year
+
+        if pool_month is not None:
+            params["filter[pool_month]"] = pool_month
+
+        if primary_campus_id is not None:
+            params["filter[primary_campus_id]"] = primary_campus_id
+
+        page = 1
+        while True:
+            params["page"] = page
+
+            response = api.get("https://api.intra.42.fr/v2/users", params=params)
+            data = response.json()
+
+            if not data:
+                break
+
+            with open("users.json", "w") as f:
+                json.dump(data, f, indent=4)
+
+            users.extend(data)
+
+            page += 1
+
+        return users
+
+        response = api.get(f"https://api.intra.42.fr/v2/")
 
     @staticmethod
     def get_user_id(api: OAuth2Session, login: str):

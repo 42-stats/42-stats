@@ -4,6 +4,7 @@ from src.modules.evaluator_score import EvaluatorScore
 from src.modules.feature_request import FeatureRequest
 from src.modules.friends_evals import FriendsEval
 from src.modules.odds_of_failing import OddsOfFailing
+from src.modules.piscine import Piscine
 from src.request import Request
 
 
@@ -18,6 +19,7 @@ def main():
             "analyze my weaknesses": FeedbackAnalyzer(api),
             "evaluation network analysis": FriendsEval(api),
             "i have another question": FeatureRequest(api),
+            "piscine": Piscine(api),
         }
 
         interface = Interface("What would you like to know?", modules)
