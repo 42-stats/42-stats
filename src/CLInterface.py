@@ -1,83 +1,81 @@
-from simple_term_menu import TerminalMenu
-from src.modules.evaluator_score import EvaluatorScore
-from src.modules.odds_of_failing import OddsOfFailing
-from src.modules.feature_request import FeatureRequest
-from src.modules.analyze_feedback import FeedbackAnalyzer
-from src.modules.friends_evals import FriendsEval
-from src.request import Request
-import os
 import logging
+from simple_term_menu import TerminalMenu
+from src.modules.base import BaseModule
 import sys
 
-logging.basicConfig(level=logging.WARNING)
-welcome_message = "\rwhat would you like to know?\n"
+from src.utils import clear_terminal
 
 
 class Interface:
-
-    def __init__(self):
-        request = Request()
-        self.api = request.api
+    def __init__(self, title: str, modules: dict[str, BaseModule], can_go_back=False):
+        self.can_go_back = can_go_back
+        self.title = title
+        self.modules = modules
         self.logs = logging.getLogger("logs")
-        self.modules = {
-            "average score as an evaluator": EvaluatorScore(self.api),
-            "odds of failing next project": OddsOfFailing(self.api),
-            "analyze my weaknesses": FeedbackAnalyzer(self.api),
-            "evaluation network analysis": FriendsEval(self.api),
-            "i have another question": FeatureRequest(self.api),
-        }
-        try:
-            self.welcome_user()
-        except KeyboardInterrupt:
-            os.system("clear")
-            sys.exit(1)
 
-    def error(self, message: str):
-        self.logs.error(message)
-        if self.prompt(["go back", "quit"]) == "quit":
-            os.system("clear")
+    def loop(self):
+        options = list(self.modules.keys())
+        if self.can_go_back:
+            options.append("go back")
+        options.append("quit")
+
+        while True:
+            clear_terminal()
+            print(self.title)
+
+            selection = self.prompt(options)
+
+            if selection == "quit":
+                clear_terminal()
+                print("Bye")
+                sys.exit(0)
+
+            if self.can_go_back and selection == "go back":
+                return
+
+            if selection not in self.modules:
+                print(
+                    f"Error: Non existent module selected (this should not happen): {selection}"
+                )
+                sys.exit(1)
+
+            try:
+                # TODO: The module should print the result itself
+                result = self.modules[selection].run()
+
+                if result is None:
+                    continue
+
+                self.show_result(result)
+            except Exception as error:
+                self.error(error)
+
+    def show_result(self, result: str):
+        clear_terminal()
+
+        print(result)
+
+        # TODO: better solution for this
+        if result != "skip" and self.prompt(["go back", "quit"]) == "quit":
+            clear_terminal()
             sys.exit(0)
-        else:
-            self.welcome_user()
 
-    def prompt(self, options: list) -> str:
+    def error(self, error: Exception):
+        self.logs.error(f"We have encountered an unhandled error:\n{error}\n")
+
+        if self.prompt(["continue", "quit"]) == "continue":
+            return
+
+        print("Bye")
+        sys.exit(1)
+
+    def prompt(self, options: list[str]) -> str:
         terminal_menu = TerminalMenu(options)
         menu_entry_index = terminal_menu.show()
 
         if menu_entry_index is None:
+            clear_terminal()
             print("Bye")
             sys.exit(0)
 
         return options[menu_entry_index]
-
-    def welcome_user(self) -> None:
-        os.system("clear")
-        print(welcome_message)
-
-        options = list(self.modules.keys()) + ["quit"]
-        request = self.prompt(options)
-
-        if request == "quit":
-            os.system("clear")
-            sys.exit(0)
-
-        if request not in self.modules:
-            print(
-                f"Error: Non existent module selected (this should not happen): ${request}"
-            )
-            sys.exit(0)
-
-        try:
-            result = self.modules[request].run()
-            self.show_result(result=result)
-        except Exception as e:
-            self.error(f"\rerror: {e}")
-
-    def show_result(self, result: str):
-        os.system("clear")
-        print(f"\r{result}")
-        if result != "skip" and self.prompt(["go back", "quit"]) == "quit":
-            os.system("clear")
-            sys.exit(0)
-        else:
-            self.welcome_user()

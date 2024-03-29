@@ -1,7 +1,13 @@
+import os
 from requests_oauthlib import OAuth2Session
 import pandas as pd
 import json
 import time
+
+
+def clear_terminal():
+    # Since Windows likes to be special the command is `cls` and not `clear`
+    os.system("cls" if os.name == "nt" else "clear")
 
 
 class Utils:
