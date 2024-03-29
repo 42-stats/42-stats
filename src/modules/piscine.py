@@ -1,7 +1,8 @@
-import datetime
+import sys
+from simple_term_menu import TerminalMenu
 from src.CLInterface import Interface
 from src.modules.base import BaseModule
-from src.utils import Utils
+from src.utils import Utils, prompt_campus
 
 
 class Piscine(BaseModule):
@@ -22,6 +23,7 @@ class AcceptedPisciners(BaseModule):
         )
         print()
 
+        campus = prompt_campus()
         year = input("Year of the Piscine: ")
         month = input("Month of the Piscine: ")
 
@@ -30,7 +32,7 @@ class AcceptedPisciners(BaseModule):
             pool_year=year,
             pool_month=month,
             cursus_id=21,
-            primary_campus_id=53,
+            primary_campus_id=campus,
         )
 
         result = [
