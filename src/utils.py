@@ -163,68 +163,76 @@ class Utils:
         raise Exception(f"Request {url} failed after max retries")
 
 
-def prompt_campus() -> int:
-    campuses = {
-        "Paris": 1,
-        "Lyon": 9,
-        "Nineteen": 12,
-        "Helsinki": 13,
-        "Amsterdam": 14,
-        "Khouribga": 16,
-        "Sao_paulo": 20,
-        "Benguerir": 21,
-        "Madrid": 22,
-        "Quebec": 25,
-        "Tokyo": 26,
-        "Rio De Janeiro": 28,
-        "Seoul": 29,
-        "Rome": 30,
-        "Angouleme": 31,
-        "Yerevan": 32,
-        "Bangkok": 33,
-        "Kuala Lumpur": 34,
-        "Amman": 35,
-        "Adelaide": 36,
-        "Malaga": 37,
-        "Lisboa": 38,
-        "Heilbronn": 39,
-        "Urduliz": 40,
-        "Nice": 41,
-        "Abu Dhabi": 43,
-        "Wolfsburg": 44,
-        "Alicante": 45,
-        "Barcelona": 46,
-        "Lausanne": 47,
-        "Mulhouse": 48,
-        "Istanbul": 49,
-        "Kocaeli": 50,
-        "Berlin": 51,
-        "Florence": 52,
-        "Vienna": 53,
-        "Tétouan": 55,
-        "Prague": 56,
-        "London": 57,
-        "Porto": 58,
-        "Luxembourg": 59,
-        "Perpignan": 60,
-        "Belo Horizonte": 61,
-        "Le Havre": 62,
-        "Singapore": 64,
-        "Antananarivo": 65,
-        "Warsaw": 67,
-        "Luanda": 68,
-        "Gyeongsan": 69,
-        "Nablus": 70,
-        "Beirut": 71,
-        "Milano": 72,
-    }
+campuses = {
+    "Paris": 1,
+    "Lyon": 9,
+    "Nineteen": 12,
+    "Helsinki": 13,
+    "Amsterdam": 14,
+    "Khouribga": 16,
+    "Sao_paulo": 20,
+    "Benguerir": 21,
+    "Madrid": 22,
+    "Quebec": 25,
+    "Tokyo": 26,
+    "Rio De Janeiro": 28,
+    "Seoul": 29,
+    "Rome": 30,
+    "Angouleme": 31,
+    "Yerevan": 32,
+    "Bangkok": 33,
+    "Kuala Lumpur": 34,
+    "Amman": 35,
+    "Adelaide": 36,
+    "Malaga": 37,
+    "Lisboa": 38,
+    "Heilbronn": 39,
+    "Urduliz": 40,
+    "Nice": 41,
+    "Abu Dhabi": 43,
+    "Wolfsburg": 44,
+    "Alicante": 45,
+    "Barcelona": 46,
+    "Lausanne": 47,
+    "Mulhouse": 48,
+    "Istanbul": 49,
+    "Kocaeli": 50,
+    "Berlin": 51,
+    "Florence": 52,
+    "Vienna": 53,
+    "Tétouan": 55,
+    "Prague": 56,
+    "London": 57,
+    "Porto": 58,
+    "Luxembourg": 59,
+    "Perpignan": 60,
+    "Belo Horizonte": 61,
+    "Le Havre": 62,
+    "Singapore": 64,
+    "Antananarivo": 65,
+    "Warsaw": 67,
+    "Luanda": 68,
+    "Gyeongsan": 69,
+    "Nablus": 70,
+    "Beirut": 71,
+    "Milano": 72,
+}
 
+
+def prompt_campus(title="Select your campus\n") -> int:
     options = sorted(campuses.keys())
 
-    campus = TerminalMenu(options, title="Select your Campus\n").show()
+    campus = TerminalMenu(options, title=title).show()
 
     if campus is None:
         print("Bye")
         sys.exit(0)
 
     return campuses[options[campus]]
+
+
+def get_campus_name(campus_id: int) -> str:
+    for name, id in campuses.items():
+        if id == campus_id:
+            return name
+    return "Unknown"

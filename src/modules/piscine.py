@@ -2,7 +2,7 @@ import sys
 from simple_term_menu import TerminalMenu
 from src.CLInterface import Interface
 from src.modules.base import BaseModule
-from src.utils import Utils, prompt_campus
+from src.utils import Utils, get_campus_name, prompt_campus
 
 
 class Piscine(BaseModule):
@@ -17,13 +17,16 @@ class Piscine(BaseModule):
 
 class AcceptedPisciners(BaseModule):
     def run(self) -> str:
-        print("Gets the Pisciners which got accepted to 42.")
-        print(
-            "Note: Only accepted Pisciners who already registered to the Kickoff are shown in this list."
+        title = (
+            "Gets the Pisciners which got accepted to 42.\n"
+            "Note: Only accepted Pisciners who already registered to the Kickoff are shown in this list.\n"
+            "\n"
+            "Select your campus: "
         )
-        print()
 
-        campus = prompt_campus()
+        campus = prompt_campus(title + "\n")
+        print(title + get_campus_name(campus))
+
         year = input("Year of the Piscine: ")
         month = input("Month of the Piscine: ")
 
