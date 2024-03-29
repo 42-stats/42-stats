@@ -8,8 +8,7 @@ import time
 
 def clear_terminal():
     # Since Windows likes to be special the command is `cls` and not `clear`
-    # os.system("cls" if os.name == "nt" else "clear")
-    return
+    os.system("cls" if os.name == "nt" else "clear")
 
 
 class Utils:
@@ -86,8 +85,6 @@ class Utils:
             page += 1
 
         return users
-
-        response = api.get(f"https://api.intra.42.fr/v2/")
 
     @staticmethod
     def get_user_id(api: OAuth2Session, login: str):

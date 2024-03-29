@@ -20,10 +20,10 @@ class AcceptedPisciners(BaseModule):
         print(
             "Note: Only accepted Pisciners who already registered to the Kickoff are shown in this list."
         )
+        print()
 
-        # TODO: should this be an input too?
-        year = datetime.date.today().year
-        month = input("In which month did this Piscine start?")
+        year = input("Year of the Piscine: ")
+        month = input("Month of the Piscine: ")
 
         users = Utils.get_users(
             self.api,
@@ -33,16 +33,21 @@ class AcceptedPisciners(BaseModule):
             primary_campus_id=53,
         )
 
-        data = [user["login"] for user in users]
-        data = sorted(data)
+        result = [
+            "Pisciners registered to Kickoff:\n",
+        ]
 
-        data.insert(0, "Accepted Pisciners registered to Kickoff:\n")
-        data.append("\nTotal: " + str(len(users)))
+        if len(users) > 0:
+            result.append(
+                format_table_as_string(sorted([user["login"] for user in users]), 6)
+            )
 
-        return "\n".join(data) + "\n"
+        result.append(f"\nTotal: {len(users)}\n")
+
+        return "\n".join(result)
 
 
-def format_table(strings, num_columns) -> str:
+def format_table_as_string(strings, num_columns):
     # Calculate the necessary rows
     num_rows = -(-len(strings) // num_columns)  # Ceiling division
 
@@ -52,12 +57,13 @@ def format_table(strings, num_columns) -> str:
     # Calculate max width for each column
     col_widths = [max(len(item) for item in col) for col in table]
 
-    result = ""
-
-    # Print the table
+    # Accumulate the table into a string
+    table_str = ""
     for row_idx in range(num_rows):
         for col_idx, col in enumerate(table):
-            # Print item with padding, if the item exists in the current row
+            # Append item with padding, if the item exists in the current row
             if row_idx < len(col):
-                print(f"{col[row_idx]:<{col_widths[col_idx]}}", end="    ")
-        print()  # Newline after each row
+                table_str += f"{col[row_idx]:<{col_widths[col_idx]}}    "
+        table_str += "\n"  # Newline after each row
+
+    return table_str.strip()  # Remove trailing newline
