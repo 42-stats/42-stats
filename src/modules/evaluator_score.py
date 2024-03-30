@@ -1,5 +1,5 @@
 from src.modules.base import BaseModule
-from src.utils import Utils
+from src.utils import Utils, prompt
 import threading
 from src.animation_utils import Animation
 
@@ -7,7 +7,7 @@ from src.animation_utils import Animation
 class EvaluatorScore(BaseModule):
 
     def run(self) -> str:
-        login = input("login: ")
+        login = prompt("login: ")
         loading_animation = Animation(
             f"Fetching evaluations involving {login} as a corrector"
         )

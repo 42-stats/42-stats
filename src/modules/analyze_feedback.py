@@ -1,5 +1,5 @@
 from src.modules.base import BaseModule
-from src.utils import Utils
+from src.utils import Utils, prompt
 from src.animation_utils import Animation
 import threading
 from textblob import TextBlob
@@ -36,7 +36,7 @@ class FeedbackAnalyzer(BaseModule):
             "\rDo (very) basic language processing to list the negative comments you have received\n"
         )
         side = self.prompt(["as corrector?", "as corrected?"])
-        login = input("\rlogin: ")
+        login = prompt("\rlogin: ")
         side = side.replace(" ", "_")
         try:
             loading_animation = Animation(f"Fetching evaluation for user: {login}")

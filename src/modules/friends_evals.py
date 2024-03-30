@@ -1,5 +1,5 @@
 from src.modules.base import BaseModule
-from src.utils import Utils
+from src.utils import Utils, prompt
 from src.animation_utils import Animation
 from collections import Counter
 import pandas as pd
@@ -69,7 +69,7 @@ class FriendsEval(BaseModule):
         return self.format_result(login_counts, login)
 
     def run(self) -> str:
-        login = input("Login: ")
+        login = prompt("Login: ")
         try:
             loading_animation = Animation(f"Fetching all evaluations involving {login}")
             user_id = Utils.get_user_id(self.api, login)
