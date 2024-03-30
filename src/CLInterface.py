@@ -1,5 +1,6 @@
 import logging
 from simple_term_menu import TerminalMenu
+from src.InterfaceResult import InterfaceResult
 from src.modules.base import BaseModule
 import sys
 
@@ -40,13 +41,18 @@ class Interface:
                 sys.exit(1)
 
             try:
-                # TODO: The module should print the result itself
                 result = self.modules[selection].run()
 
-                if result is None:
+                if result == InterfaceResult.Exit:
+                    sys.exit(0)
+
+                if result == InterfaceResult.Skip:
                     continue
 
-                self.show_result(result)
+                selection = self.prompt(["go back", "quit"])
+                if selection == "quit" or selection == None:
+                    sys.exit(0)
+
             except Exception as error:
                 self.error(error)
 
