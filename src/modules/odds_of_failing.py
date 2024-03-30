@@ -17,7 +17,7 @@ class OddsOfFailing(BaseModule):
                 api=self.api, user_id=user_id, side="as_corrected"
             )
             evals = evals.dropna(subset=["final_mark"])
-            average = evals["final_mark"].mean()
+            average = evals["final_mark"].clip(upper=100).mean()
             result = 100 - average
             return_message = f"\rresult: {round(result, 2)}%\n"
         except Exception as e:
