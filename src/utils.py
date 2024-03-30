@@ -1,4 +1,5 @@
 import os
+import sys
 from requests_oauthlib import OAuth2Session
 import pandas as pd
 import json
@@ -8,6 +9,15 @@ import time
 def clear_terminal():
     # Since Windows likes to be special the command is `cls` and not `clear`
     os.system("cls" if os.name == "nt" else "clear")
+
+
+def prompt(message: str):
+    try:
+        return input(message)
+    except EOFError:
+        sys.exit(1)
+    except KeyboardInterrupt:
+        sys.exit(1)
 
 
 class Utils:
