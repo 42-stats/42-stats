@@ -4,6 +4,7 @@ from requests_oauthlib import OAuth2Session
 import pandas as pd
 import json
 import time
+from simple_term_menu import TerminalMenu
 
 
 def clear_terminal():
@@ -18,6 +19,23 @@ def prompt(message: str):
         sys.exit(1)
     except KeyboardInterrupt:
         sys.exit(1)
+
+
+def prompt_select(options: list, **kwargs):
+    menu = TerminalMenu(
+        options,
+        menu_cursor="❯ ",
+        menu_cursor_style=("fg_cyan", "bold"),
+        menu_highlight_style=("bg_cyan", "fg_black"),
+        **kwargs,
+    )
+
+    index = menu.show()
+
+    if index is None:
+        sys.exit(0)
+
+    return options[index]
 
 
 class Utils:
