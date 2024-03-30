@@ -4,7 +4,7 @@ from src.InterfaceResult import InterfaceResult
 from src.modules.base import BaseModule
 import sys
 
-from src.utils import clear_terminal
+from src.utils import clear_terminal, prompt_select
 
 
 class Interface:
@@ -24,7 +24,7 @@ class Interface:
             clear_terminal()
             print(self.title)
 
-            selection = self.prompt(options)
+            selection = prompt_select(options)
 
             if selection == "quit":
                 clear_terminal()
@@ -49,7 +49,7 @@ class Interface:
                 if result == InterfaceResult.Skip:
                     continue
 
-                selection = self.prompt(["go back", "quit"])
+                selection = prompt_select(["go back", "quit"])
                 if selection == "quit" or selection == None:
                     sys.exit(0)
 
@@ -62,26 +62,15 @@ class Interface:
         print(result)
 
         # TODO: better solution for this
-        if result != "skip" and self.prompt(["go back", "quit"]) == "quit":
+        if result != "skip" and prompt_select(["go back", "quit"]) == "quit":
             clear_terminal()
             sys.exit(0)
 
     def error(self, error: Exception):
         self.logs.error(f"We have encountered an unhandled error:\n{error}\n")
 
-        if self.prompt(["continue", "quit"]) == "continue":
+        if prompt_select(["continue", "quit"]) == "continue":
             return
 
         print("Bye")
         sys.exit(1)
-
-    def prompt(self, options: list[str]) -> str:
-        terminal_menu = TerminalMenu(options)
-        menu_entry_index = terminal_menu.show()
-
-        if menu_entry_index is None:
-            clear_terminal()
-            print("Bye")
-            sys.exit(0)
-
-        return options[menu_entry_index]
