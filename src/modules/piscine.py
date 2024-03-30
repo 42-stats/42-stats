@@ -1,8 +1,9 @@
+import datetime
 import sys
 from simple_term_menu import TerminalMenu
 from src.CLInterface import Interface
 from src.modules.base import BaseModule
-from src.utils import Utils, get_campus_name, prompt_campus
+from src.utils import Utils, clear_last_line, get_campus_name, prompt_campus
 
 
 class Piscine(BaseModule):
@@ -28,7 +29,11 @@ class AcceptedPisciners(BaseModule):
         print(title + get_campus_name(campus))
 
         year = input("Year of the Piscine: ")
-        month = input("Month of the Piscine: ")
+        if year == "":
+            year = datetime.date.today().year
+            clear_last_line()
+            print(f"Year of the Piscine: {year}")
+        month = month_prompt()
 
         users = Utils.get_users(
             self.api,
@@ -50,6 +55,38 @@ class AcceptedPisciners(BaseModule):
         result.append(f"\nTotal: {len(users)}\n")
 
         return "\n".join(result)
+
+
+def month_prompt() -> str:
+    months = [
+        "January",
+        "February",
+        "March",
+        "April",
+        "May",
+        "June",
+        "July",
+        "August",
+        "September",
+        "October",
+        "November",
+        "December",
+    ]
+    month_menu = TerminalMenu(
+        months,
+        title="Select the month of the Piscine: ",
+        menu_cursor="❯ ",
+        menu_cursor_style=("fg_red", "bold"),
+        menu_highlight_style=("bg_red", "fg_yellow"),
+    )
+
+    month_index = month_menu.show()
+
+    if month_index == None:
+        print("Bye")
+        sys.exit(0)
+
+    return months[month_index].lower()
 
 
 def format_table_as_string(strings, num_columns):

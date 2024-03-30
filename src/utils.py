@@ -14,6 +14,10 @@ def clear_terminal():
     os.system("cls" if os.name == "nt" else "clear")
 
 
+def clear_last_line():
+    print("\033[A\033[K", end="")
+
+
 def prompt(message: str):
     try:
         return input(message)
