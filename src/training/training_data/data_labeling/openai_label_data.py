@@ -20,14 +20,16 @@ def generate_text_labels_batch(texts):
             messages=[
                 {
                     "role": "system",
-                    "content": "You rate feedback based on constructivity",
+                    "content": "You are evaluating feedback from a coding school. Constructive feedback typically identifies specific strengths and areas for improvement, offers concrete suggestions, and encourages positive development. Feedback that lacks detail, does not relate to specific actions, or fails to offer guidance for improvement is less constructive. One exception is when the student pushed an empty repository/empty folder - Please rate this with -1 so I can filter them out.Your task is to rate feedback based on its constructiveness.",
                 },
                 {
                     "role": "user",
-                    "content": f"{text}; Rate this 42 Coding School evaluation feedback on a scale from 0 (completely out of place) to 9 (very constructive) - Only give me a number from 0 to 9, nothing else! Remember to be strict, the goal here is to improve the feedbacks",
+                    "content": f"{text}; Considering the criteria for constructive feedback, rate this 42 Coding School evaluation feedback on a scale from 0 (completely out of place and not helpful) to 9 (very constructive, offering specific, actionable, and encouraging guidance). Only provide a number from 0 to 9. Be strict in your evaluation; the goal here is to identify feedback that genuinely contributes to improvement. Remember, a '9' should be reserved for feedback that is exemplary in specificity, helpfulness, and encouragement, while a '0' indicates feedback that is not applicable or useful for development.",
                 },
             ],
         )
+
+
         label = response.choices[0].message.content
         labels.append(label)
         text_label_mapping[text] = label
