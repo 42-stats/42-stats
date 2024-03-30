@@ -1,5 +1,6 @@
+from src.InterfaceResult import InterfaceResult
 from src.modules.base import BaseModule
-from src.utils import Utils
+from src.utils import Utils, prompt
 from src.animation_utils import Animation
 import threading
 from textblob import TextBlob
@@ -9,9 +10,7 @@ from googletrans import Translator, LANGUAGES
 class FeedbackAnalyzer(BaseModule):
 
     def translate_to_english(self, comments) -> list:
-        done_event = threading.Event()
         loading_animation = Animation("Translating comments")
-        translator = Translator()
         translated_comments = []
 
         for comment in comments:
@@ -38,7 +37,7 @@ class FeedbackAnalyzer(BaseModule):
             "\rDo (very) basic language processing to list the negative comments you have received\n"
         )
         side = self.prompt(["as corrector?", "as corrected?"])
-        login = input("\rlogin: ")
+        login = prompt("\rlogin: ")
         side = side.replace(" ", "_")
         try:
             loading_animation = Animation(f"Fetching evaluation for user: {login}")
@@ -66,4 +65,10 @@ class FeedbackAnalyzer(BaseModule):
                 negative_comments.append(comment)
         loading_animation.stop_animation()
         formatted_negative_comments = "\n-\n".join(negative_comments)
-        return f"{len(negative_comments)} negative comments found:\n-\n{formatted_negative_comments}"
+
+        clear_terminal()
+        print(
+            f"{len(negative_comments)} negative comments found:\n-\n{formatted_negative_comments}"
+        )
+
+        return InterfaceResult.Success

@@ -13,6 +13,15 @@ def clear_terminal():
     os.system("cls" if os.name == "nt" else "clear")
 
 
+def prompt(message: str):
+    try:
+        return input(message)
+    except EOFError:
+        sys.exit(1)
+    except KeyboardInterrupt:
+        sys.exit(1)
+
+
 class Utils:
     def __init__(self) -> None:
         pass

@@ -1,5 +1,6 @@
+from src.InterfaceResult import InterfaceResult
 from src.modules.base import BaseModule
-from src.utils import Utils
+from src.utils import Utils, prompt
 from src.animation_utils import Animation
 from collections import Counter
 import pandas as pd
@@ -65,11 +66,15 @@ class FriendsEval(BaseModule):
         os.system("clear")
         print(self.get_top_10(login_counts, login))
         if self.prompt(["get full list", "go back"]) == "go back":
-            return "skip"
-        return self.format_result(login_counts, login)
+            clear_terminal()
+            return InterfaceResult.Skip
+
+        clear_terminal()
+        print(self.format_result(login_counts, login))
+        return InterfaceResult.Success
 
     def run(self) -> str:
-        login = input("Login: ")
+        login = prompt("Login: ")
         try:
             loading_animation = Animation(f"Fetching all evaluations involving {login}")
             user_id = Utils.get_user_id(self.api, login)
