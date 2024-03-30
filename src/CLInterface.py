@@ -17,8 +17,8 @@ class Interface:
     def loop(self):
         options = list(self.modules.keys())
         if self.can_go_back:
-            options.append("go back")
-        options.append("quit")
+            options.append("Go Back")
+        options.append("Quit")
 
         while True:
             clear_terminal()
@@ -26,12 +26,12 @@ class Interface:
 
             selection = prompt_select(options)
 
-            if selection == "quit":
+            if selection == "Quit":
                 clear_terminal()
                 print("Bye")
                 sys.exit(0)
 
-            if self.can_go_back and selection == "go back":
+            if self.can_go_back and selection == "Go Back":
                 return
 
             if selection not in self.modules:
@@ -49,8 +49,8 @@ class Interface:
                 if result == InterfaceResult.Skip:
                     continue
 
-                selection = prompt_select(["go back", "quit"])
-                if selection == "quit" or selection == None:
+                selection = prompt_select(["Go Back", "Quit"])
+                if selection == "Quit" or selection == None:
                     sys.exit(0)
 
             except Exception as error:
@@ -62,14 +62,14 @@ class Interface:
         print(result)
 
         # TODO: better solution for this
-        if result != "skip" and prompt_select(["go back", "quit"]) == "quit":
+        if result != "skip" and prompt_select(["Go Back", "Quit"]) == "Quit":
             clear_terminal()
             sys.exit(0)
 
     def error(self, error: Exception):
         self.logs.error(f"We have encountered an unhandled error:\n{error}\n")
 
-        if prompt_select(["continue", "quit"]) == "continue":
+        if prompt_select(["Continue", "Quit"]) == "continue":
             return
 
         print("Bye")

@@ -252,8 +252,9 @@ campuses = {
 
 def prompt_campus(title="Select your campus\n") -> int:
     options = sorted(campuses.keys())
+    campus = prompt_select(options, title=title)
 
-    return prompt_select(options, title=title)
+    return campuses[campus]
 
 
 def get_campus_name(campus_id: int) -> str:

@@ -14,12 +14,12 @@ def main():
         api = request.api
 
         modules = {
-            "average score as an evaluator": EvaluatorScore(api),
-            "odds of failing next project": OddsOfFailing(api),
-            "analyze my weaknesses": FeedbackAnalyzer(api),
-            "evaluation network analysis": FriendsEval(api),
-            "i have another question": FeatureRequest(api),
-            "piscine": Piscine(api),
+            "Average score as an evaluator": EvaluatorScore(api),
+            "Odds of failing next project": OddsOfFailing(api),
+            "Analyze my weaknesses": FeedbackAnalyzer(api),
+            "Evaluation network analysis": FriendsEval(api),
+            "I have another question": FeatureRequest(api),
+            "Piscine": Piscine(api),
         }
 
         interface = Interface("What would you like to know?", modules)

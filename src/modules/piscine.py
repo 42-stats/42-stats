@@ -3,7 +3,13 @@ import sys
 from simple_term_menu import TerminalMenu
 from src.CLInterface import Interface
 from src.modules.base import BaseModule
-from src.utils import Utils, clear_last_line, get_campus_name, prompt_campus
+from src.utils import (
+    Utils,
+    clear_last_line,
+    get_campus_name,
+    prompt_campus,
+    prompt_select,
+)
 
 
 class Piscine(BaseModule):
@@ -33,7 +39,8 @@ class AcceptedPisciners(BaseModule):
             year = datetime.date.today().year
             clear_last_line()
             print(f"Year of the Piscine: {year}")
-        month = month_prompt()
+        month = month_prompt("Month of the Piscine")
+        print("Month of the Piscine: " + month.capitalize())
 
         users = Utils.get_users(
             self.api,
@@ -43,21 +50,15 @@ class AcceptedPisciners(BaseModule):
             primary_campus_id=campus,
         )
 
-        result = [
-            "Pisciners registered to Kickoff:\n",
-        ]
+        print("\nPisciners registered to Kickoff:\n")
 
         if len(users) > 0:
-            result.append(
-                format_table_as_string(sorted([user["login"] for user in users]), 6)
-            )
+            print(format_table_as_string(sorted([user["login"] for user in users]), 6))
 
-        result.append(f"\nTotal: {len(users)}\n")
-
-        return "\n".join(result)
+        print(f"\nTotal: {len(users)}\n")
 
 
-def month_prompt() -> str:
+def month_prompt(title="Select a month") -> str:
     months = [
         "January",
         "February",
@@ -72,21 +73,12 @@ def month_prompt() -> str:
         "November",
         "December",
     ]
-    month_menu = TerminalMenu(
+    month = prompt_select(
         months,
-        title="Select the month of the Piscine: ",
-        menu_cursor="❯ ",
-        menu_cursor_style=("fg_red", "bold"),
-        menu_highlight_style=("bg_red", "fg_yellow"),
+        title=title,
     )
 
-    month_index = month_menu.show()
-
-    if month_index == None:
-        print("Bye")
-        sys.exit(0)
-
-    return months[month_index].lower()
+    return month.lower()
 
 
 def format_table_as_string(strings, num_columns):
