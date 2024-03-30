@@ -1,3 +1,4 @@
+from src.InterfaceResult import InterfaceResult
 from src.modules.base import BaseModule
 from src.utils import Utils, prompt
 import threading
@@ -26,4 +27,7 @@ class EvaluatorScore(BaseModule):
         finally:
             loading_animation.stop_animation()
 
-        return return_message
+        clear_terminal()
+        print(return_message)
+
+        return InterfaceResult.Success

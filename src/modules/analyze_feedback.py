@@ -1,3 +1,4 @@
+from src.InterfaceResult import InterfaceResult
 from src.modules.base import BaseModule
 from src.utils import Utils, prompt
 from src.animation_utils import Animation
@@ -64,4 +65,10 @@ class FeedbackAnalyzer(BaseModule):
                 negative_comments.append(comment)
         loading_animation.stop_animation()
         formatted_negative_comments = "\n-\n".join(negative_comments)
-        return f"{len(negative_comments)} negative comments found:\n-\n{formatted_negative_comments}"
+
+        clear_terminal()
+        print(
+            f"{len(negative_comments)} negative comments found:\n-\n{formatted_negative_comments}"
+        )
+
+        return InterfaceResult.Success
