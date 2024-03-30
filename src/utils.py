@@ -249,13 +249,7 @@ campuses = {
 def prompt_campus(title="Select your campus\n") -> int:
     options = sorted(campuses.keys())
 
-    campus = TerminalMenu(options, title=title).show()
-
-    if campus is None:
-        print("Bye")
-        sys.exit(0)
-
-    return campuses[options[campus]]
+    return prompt_select(options, title=title)
 
 
 def get_campus_name(campus_id: int) -> str:
