@@ -1,6 +1,6 @@
 from src.InterfaceResult import InterfaceResult
 from src.modules.base import BaseModule
-from src.utils import Utils, clear_terminal, prompt
+from src.utils import Utils, prompt, prompt_select
 from src.animation_utils import Animation
 from collections import Counter
 import pandas as pd
@@ -65,7 +65,7 @@ class FriendsEval(BaseModule):
     def show_formatted_result(self, login_counts, login):
         os.system("clear")
         print(self.get_top_10(login_counts, login))
-        if self.prompt(["get full list", "go back"]) == "go back":
+        if prompt_select(["get full list", "go back"]) == "go back":
             clear_terminal()
             return InterfaceResult.Skip
 
