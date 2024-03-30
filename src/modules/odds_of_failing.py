@@ -1,6 +1,6 @@
 from src.InterfaceResult import InterfaceResult
 from src.modules.base import BaseModule
-from src.utils import Utils, prompt
+from src.utils import Utils, clear_terminal, prompt
 import threading
 from src.animation_utils import Animation
 
