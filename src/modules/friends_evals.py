@@ -1,7 +1,7 @@
 from src.InterfaceResult import InterfaceResult
+from src.Spinner import Spinner
 from src.modules.base import BaseModule
-from src.utils import Utils, prompt, prompt_select
-from src.animation_utils import Animation
+from src.utils import Utils, clear_terminal, prompt, prompt_select
 from collections import Counter
 import pandas as pd
 import os
@@ -75,20 +75,19 @@ class FriendsEval(BaseModule):
 
     def run(self) -> str:
         login = prompt("Login: ")
-        try:
-            loading_animation = Animation(f"Fetching all evaluations involving {login}")
-            user_id = Utils.get_user_id(self.api, login)
-            as_corrected_df = Utils.get_evaluations_for_user(
-                self.api, user_id, side="as_corrected"
-            )
-            as_corrector_df = Utils.get_evaluations_for_user(
-                self.api, user_id, side="as_corrector"
-            )
-            login_counts = self.count_logins(as_corrected_df, as_corrector_df)
-            loading_animation.stop_animation()
 
-        except Exception as e:
-            loading_animation.stop_animation()
-            raise Exception(f"An error occurred: {e}")
+        with Spinner(f"Fetching all evaluations involving {login}") as spinner:
+            try:
+                user_id = Utils.get_user_id(self.api, login)
+                as_corrected_df = Utils.get_evaluations_for_user(
+                    self.api, user_id, side="as_corrected", spinner=spinner
+                )
+                as_corrector_df = Utils.get_evaluations_for_user(
+                    self.api, user_id, side="as_corrector", spinner=spinner
+                )
+                login_counts = self.count_logins(as_corrected_df, as_corrector_df)
+
+            except Exception as e:
+                raise Exception(f"An error occurred: {e}")
 
         return self.show_formatted_result(login_counts, login)
