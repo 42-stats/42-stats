@@ -5,8 +5,26 @@ from src.utils import Utils, clear_terminal, prompt
 
 
 class OddsOfFailing(BaseModule):
+    """
+    A module that calculates the odds of failing based on evaluation scores.
+
+    This module prompts the user for a login, fetches the evaluation scores for the user,
+    calculates the average score, and returns the odds of failing as a percentage.
+
+    Attributes:
+        api: The API object used for making API requests.
+
+    Methods:
+        run: Runs the module and returns the result as a string.
+    """
 
     def run(self) -> str:
+        """
+        Runs the module and returns the result as a string.
+
+        Returns:
+            A string representing the result of the module.
+        """
         login = prompt("login: ")
 
         with Spinner(f"Fetching groups for {login}") as spinner:

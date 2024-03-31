@@ -8,13 +8,34 @@ from src.utils import clear_terminal, prompt_select
 
 
 class Interface:
+    """
+    Represents a command-line interface for interacting with modules.
+
+    Attributes:
+        can_go_back (bool): Indicates whether the interface allows going back to the previous menu.
+        title (str): The title of the interface.
+        modules (dict[str, BaseModule]): A dictionary of modules available in the interface.
+        logs (logging.Logger): The logger used for logging interface events.
+    """
+
     def __init__(self, title: str, modules: dict[str, BaseModule], can_go_back=False):
+        """
+        Initializes a new instance of the Interface class.
+
+        Args:
+            title (str): The title of the interface.
+            modules (dict[str, BaseModule]): A dictionary of modules available in the interface.
+            can_go_back (bool, optional): Indicates whether the interface allows going back to the previous menu. Defaults to False.
+        """
         self.can_go_back = can_go_back
         self.title = title
         self.modules = modules
         self.logs = logging.getLogger("logs")
 
     def loop(self):
+        """
+        Starts the main loop of the interface, allowing the user to interact with the modules.
+        """
         options = list(self.modules.keys())
         if self.can_go_back:
             options.append("go back")
@@ -57,6 +78,12 @@ class Interface:
                 self.error(error)
 
     def show_result(self, result: str):
+        """
+        Displays the result of a module execution.
+
+        Args:
+            result (str): The result to be displayed.
+        """
         clear_terminal()
 
         print(result)
@@ -67,6 +94,12 @@ class Interface:
             sys.exit(0)
 
     def error(self, error: Exception):
+        """
+        Handles an unhandled error encountered during module execution.
+
+        Args:
+            error (Exception): The error that occurred.
+        """
         self.logs.error(f"We have encountered an unhandled error:\n{error}\n")
 
         if prompt_select(["continue", "quit"]) == "continue":

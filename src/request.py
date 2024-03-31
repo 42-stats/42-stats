@@ -6,11 +6,20 @@ import dotenv
 
 
 class Request:
+    """
+    Represents a request object used to interact with an API.
+    """
 
     def __init__(self):
         self.api = self.set_api()
 
     def set_api(self):
+        """
+        Sets up the API client and fetches the access token.
+
+        Returns:
+            api (OAuth2Session): The API client with the access token.
+        """
         dotenv.load_dotenv()
 
         client_secret = os.getenv("API_SECRET")

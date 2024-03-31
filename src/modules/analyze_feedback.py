@@ -7,9 +7,24 @@ from googletrans import Translator, LANGUAGES
 
 
 class FeedbackAnalyzer(BaseModule):
+    """
+    Analyzes feedback comments and performs basic language processing to list negative comments.
+
+    Attributes:
+        api: The API object used for fetching evaluations.
+    """
 
     @Spinner("Translating comments")
     def translate_to_english(self, comments) -> list:
+        """
+        Translates comments to English.
+
+        Args:
+            comments: A list of comments to be translated.
+
+        Returns:
+            A list of translated comments.
+        """
         translated_comments = []
 
         for comment in comments:
@@ -29,6 +44,12 @@ class FeedbackAnalyzer(BaseModule):
         return translated_comments
 
     def run(self) -> str:
+        """
+        Runs the feedback analysis.
+
+        Returns:
+            A string indicating the result of the analysis.
+        """
         print("\rwarning: shitty feature lol")
         print(
             "\rDo (very) basic language processing to list the negative comments you have received\n"

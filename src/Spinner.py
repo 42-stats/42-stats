@@ -12,6 +12,31 @@ _spinners = {
 
 
 class Spinner:
+    """
+    A class that represents a spinner animation.
+
+    Attributes:
+        CYAN_COLOR (str): The ANSI escape code for cyan color.
+        RESET_COLOR (str): The ANSI escape code to reset the color.
+
+    Methods:
+        __init__(self, text: str, spinner: str = "dots", status_message: Optional[str] = None):
+            Initializes a Spinner object.
+        __enter__(self):
+            Starts the spinner animation.
+        __exit__(self, exc_type, exc_value, traceback):
+            Stops the spinner animation.
+        __call__(self, fn):
+            Decorator that starts the spinner animation before calling the decorated function.
+        start(self):
+            Starts the spinner animation.
+        stop(self):
+            Stops the spinner animation.
+        status_message(self, message: str):
+            Sets the status message to be displayed alongside the spinner animation.
+
+    """
+
     CYAN_COLOR = "\033[96m"
     RESET_COLOR = "\033[0m"
 
@@ -30,19 +55,46 @@ class Spinner:
         spinner: str = "dots",
         status_message: Optional[str] = None,
     ):
+        """
+        Initializes a Spinner object.
+
+        Args:
+            text (str): The text to be displayed alongside the spinner animation.
+            spinner (str, optional): The type of spinner animation to use. Defaults to "dots".
+            status_message (str, optional): The initial status message to be displayed. Defaults to None.
+        """
         self._text = text
         self._interval = _spinners[spinner]["interval"]
         self._cycle = itertools.cycle(_spinners[spinner]["frames"])
         self._status_message = status_message
 
     def __enter__(self):
+        """
+        Starts the spinner animation.
+
+        Returns:
+            Spinner: The Spinner object itself.
+        """
         self.start()
         return self
 
     def __exit__(self, exc_type, exc_value, traceback):
+        """
+        Stops the spinner animation.
+        """
         self.stop()
 
     def __call__(self, fn):
+        """
+        Decorator that starts the spinner animation before calling the decorated function.
+
+        Args:
+            fn (function): The function to be decorated.
+
+        Returns:
+            function: The decorated function.
+        """
+
         @functools.wraps(fn)
         def wrapped(*args, **kwargs):
             with self:
@@ -51,6 +103,9 @@ class Spinner:
         return wrapped
 
     def start(self):
+        """
+        Starts the spinner animation.
+        """
         if self._thread is not None:
             return
 
@@ -61,6 +116,9 @@ class Spinner:
         self._thread.start()
 
     def stop(self):
+        """
+        Stops the spinner animation.
+        """
         if self._thread is None:
             return
 
@@ -73,6 +131,12 @@ class Spinner:
         self._clear_line()
 
     def status_message(self, message: str):
+        """
+        Sets the status message to be displayed alongside the spinner animation.
+
+        Args:
+            message (str): The status message.
+        """
         if self._status_message == message:
             self._status_message_count += 1
             return
