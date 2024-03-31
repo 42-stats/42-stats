@@ -28,6 +28,7 @@ We use GitHub issues to track bugs. Report a bug by [opening an issue](https://g
 *  Notes, for example:
 *    What you think might be happening
 *    Stuff you tried that did not work
+
 The more thorough the bug report, the easier the fix 🫀
 ## Use a Consistent Coding Style
 We use the [Black](https://black.readthedocs.io/) Python formatter.
