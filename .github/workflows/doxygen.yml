@@ -1,12 +1,14 @@
-            - name: Doxygenize
+            - name: Doxygen Action
   # You may pin to the exact commit or the version.
-  # uses: langroodi/doxygenize@542946a13bc9021f5ba07c8751e6ab3d84bca154
-  uses: langroodi/doxygenize@v1.7.0
+  # uses: mattnotmitt/doxygen-action@cbe72c8e402e8a3faa1f0b247ef90aa6c8e4ce74
+  uses: mattnotmitt/doxygen-action@1.9.8
   with:
-    # Doxygen configuration file path
-    doxygenconf: ./Doxyfile
-    htmloutput: ./docs/
-    ghpagesbranch: gh-pages
-    ghpagesdir: ./
-    darkmode: yes
+    # Path to Doxyfile
+    doxyfile-path: # default is ./Doxyfile
+    # Working directory
+    working-directory: # default is .
+    # Generate latex documentation
+    enable-latex: # optional
+    # Extra alpine packages for the build environment
+    additional-packages: # optional, default is 
           
