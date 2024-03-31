@@ -10,7 +10,7 @@ from src.request import Request
 def main():
     """
     Entry point of the program.
-    
+
     This function initializes the necessary objects and modules, and starts the main interface loop.
     If any unhandled exception occurs, it prints an error message and returns 1.
     """
