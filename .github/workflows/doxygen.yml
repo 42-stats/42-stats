@@ -4,7 +4,7 @@
   uses: langroodi/doxygenize@v1.7.0
   with:
     # Doxygen configuration file path
-    doxygenconf: ./docs/Doxyfile
+    doxygenconf: ./Doxyfile
     htmloutput: ./docs/
     ghpagesbranch: gh-pages
     ghpagesdir: ./
