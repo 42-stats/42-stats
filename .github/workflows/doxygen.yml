@@ -1,6 +1,10 @@
 name: Generate and Deploy Doxygen Documentation
 
-on: push
+on: 
+  push: 
+    branches:
+      - gh-pages
+      - main
 
 jobs:
   build-and-deploy:
