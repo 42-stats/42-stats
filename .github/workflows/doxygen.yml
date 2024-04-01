@@ -1,9 +1,6 @@
 name: Generate and Deploy Doxygen Documentation
 
-on:
-  push:
-    branches:
-      - main  # Trigger on pushes to the main branch. Adjust if your default branch has a different name.
+on: push
 
 jobs:
   build-and-deploy:
@@ -24,6 +21,6 @@ jobs:
         uses: JamesIves/github-pages-deploy-action@v4
         with:
           branch: gh-pages
-          folder: ./html
+          folder: .
           token: ${{ secrets.GITHUB_TOKEN }} 
           
