@@ -1,0 +1,19 @@
+digraph "Graphical Class Hierarchy"
+{
+ // LATEX_PDF_SIZE
+  bgcolor="transparent";
+  edge [fontname=Helvetica,fontsize=10,labelfontname=Helvetica,labelfontsize=10];
+  node [fontname=Helvetica,fontsize=10,shape=box,height=0.2,width=0.4];
+  rankdir="LR";
+  Node0 [id="Node000000",label="src.modules.base.BaseModule",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$classsrc_1_1modules_1_1base_1_1_base_module.html",tooltip=" "];
+  Node0 -> Node1 [id="edge2_Node000000_Node000001",dir="back",color="steelblue1",style="solid",tooltip=" "];
+  Node1 [id="Node000001",label="src.modules.analyze\l_feedback.FeedbackAnalyzer",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$classsrc_1_1modules_1_1analyze__feedback_1_1_feedback_analyzer.html",tooltip=" "];
+  Node0 -> Node2 [id="edge3_Node000000_Node000002",dir="back",color="steelblue1",style="solid",tooltip=" "];
+  Node2 [id="Node000002",label="src.modules.evaluator\l_score.EvaluatorScore",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$classsrc_1_1modules_1_1evaluator__score_1_1_evaluator_score.html",tooltip=" "];
+  Node0 -> Node3 [id="edge4_Node000000_Node000003",dir="back",color="steelblue1",style="solid",tooltip=" "];
+  Node3 [id="Node000003",label="src.modules.feature\l_request.FeatureRequest",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$classsrc_1_1modules_1_1feature__request_1_1_feature_request.html",tooltip=" "];
+  Node0 -> Node4 [id="edge5_Node000000_Node000004",dir="back",color="steelblue1",style="solid",tooltip=" "];
+  Node4 [id="Node000004",label="src.modules.friends\l_evals.FriendsEval",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$classsrc_1_1modules_1_1friends__evals_1_1_friends_eval.html",tooltip=" "];
+  Node0 -> Node5 [id="edge6_Node000000_Node000005",dir="back",color="steelblue1",style="solid",tooltip=" "];
+  Node5 [id="Node000005",label="src.modules.odds_of\l_failing.OddsOfFailing",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$classsrc_1_1modules_1_1odds__of__failing_1_1_odds_of_failing.html",tooltip=" "];
+}
