@@ -39,7 +39,5 @@ We use the [Black](https://black.readthedocs.io/) Python formatter.
 ```sh
 black src
 ```
-## License
-By contributing, you agree that your contributions will be licensed under its Apache 2.0 License
 ## References
 This document was adapted from [briandk's contributing guidelines template](https://gist.github.com/briandk/3d2e8b3ec8daf5a27a62)
