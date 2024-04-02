@@ -1,12 +1,13 @@
 import os
 import sys
 from typing import Optional
-from simple_term_menu import TerminalMenu
 from requests_oauthlib import OAuth2Session
 import pandas as pd
 import json
 import time
 from simple_term_menu import TerminalMenu
+
+from src.Spinner import Spinner
 
 
 def clear_terminal():
@@ -132,7 +133,7 @@ class Utils:
 
     @staticmethod
     def get_evaluations_for_user(
-        api: OAuth2Session, user_id: int, side: str
+        api: OAuth2Session, user_id: int, side: str, spinner: Optional[Spinner] = None
     ) -> pd.DataFrame:
         evaluations = []
         page = 1
@@ -142,6 +143,7 @@ class Utils:
                 api,
                 f"https://api.intra.42.fr/v2/users/{user_id}/scale_teams/{side}",
                 params={"page": page, "per_page": 100},
+                spinner=spinner,
             )
             response.raise_for_status()
 
@@ -180,13 +182,22 @@ class Utils:
 
     @staticmethod
     def make_request_with_backoff(
-        api: OAuth2Session, url: str, params: dict, max_retries: int = 5
+        api: OAuth2Session,
+        url: str,
+        params: dict,
+        max_retries: int = 5,
+        spinner: Optional[Spinner] = None,
     ):
         retry_wait = 1
         for attempt in range(max_retries):
             response = api.get(url, params=params)
             if response.status_code == 429:
-                print(f"Rate limit hit, retrying in {retry_wait} seconds...")
+                if spinner is not None:
+                    spinner.status_message(
+                        f"Rate limit hit, retrying in {retry_wait} seconds..."
+                    )
+                else:
+                    print(f"Rate limit hit, retrying in {retry_wait} seconds...")
                 time.sleep(retry_wait)
                 retry_wait *= 2
             else:
