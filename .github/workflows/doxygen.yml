@@ -23,6 +23,9 @@ jobs:
       - name: Create .nojekyll File
         run: touch ./docs/html/.nojekyll
 
+      - name: List output files
+        run: ls -R ./docs/html
+
       - name: Deploy to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@v4
         with:
