@@ -1,5 +1,4 @@
 from src.CLInterface import Interface
-from src.modules.analyze_feedback import FeedbackAnalyzer
 from src.modules.evaluator_score import EvaluatorScore
 from src.modules.feature_request import FeatureRequest
 from src.modules.friends_evals import FriendsEval
@@ -21,7 +20,6 @@ def main():
         modules = {
             "average score as an evaluator": EvaluatorScore(api),
             "odds of failing next project": OddsOfFailing(api),
-            "analyze my weaknesses": FeedbackAnalyzer(api),
             "evaluation network analysis": FriendsEval(api),
             "i have another question": FeatureRequest(api),
         }
