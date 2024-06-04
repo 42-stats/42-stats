@@ -49,6 +49,9 @@ class Interface:
                 if result == InterfaceResult.Skip:
                     continue
 
+                if result == InterfaceResult.GoBack:
+                    return
+
                 selection = prompt_select(["Go Back", "Quit"])
                 if selection == "Quit" or selection == None:
                     sys.exit(0)

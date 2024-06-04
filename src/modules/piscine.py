@@ -1,11 +1,13 @@
-import datetime
-import sys
-from simple_term_menu import TerminalMenu
+from datetime import datetime
+from prompt_toolkit import prompt
 from src.CLInterface import Interface
+from src.InterfaceResult import InterfaceResult
+from src.Spinner import Spinner
 from src.modules.base import BaseModule
 from src.utils import (
     Utils,
     clear_last_line,
+    clear_terminal,
     get_campus_name,
     prompt_campus,
     prompt_select,
@@ -13,17 +15,21 @@ from src.utils import (
 
 
 class Piscine(BaseModule):
-    def run(self) -> None:
+    def run(self) -> InterfaceResult:
         modules = {
             "Accepted Pisciners": AcceptedPisciners(self.api),
+            "Pisciners not correctly subscribed to the Exam": ExamScores(self.api),
+            "Projects Status": ProjectsStatus(self.api),
         }
 
         interface = Interface("Analyze Piscine Data", modules, can_go_back=True)
         interface.loop()
 
+        return InterfaceResult.Skip
+
 
 class AcceptedPisciners(BaseModule):
-    def run(self) -> str:
+    def run(self):
         title = (
             "Gets the Pisciners which got accepted to 42.\n"
             "Note: Only accepted Pisciners who already registered to the Kickoff are shown in this list.\n"
@@ -34,11 +40,7 @@ class AcceptedPisciners(BaseModule):
         campus = prompt_campus(title + "\n")
         print(title + get_campus_name(campus))
 
-        year = input("Year of the Piscine: ")
-        if year == "":
-            year = datetime.date.today().year
-            clear_last_line()
-            print(f"Year of the Piscine: {year}")
+        year = prompt("Year of the Piscine: ", default=str(datetime.now().year))
         month = month_prompt("Month of the Piscine")
         print("Month of the Piscine: " + month.capitalize())
 
@@ -56,6 +58,230 @@ class AcceptedPisciners(BaseModule):
             print(format_table_as_string(sorted([user["login"] for user in users]), 6))
 
         print(f"\nTotal: {len(users)}\n")
+
+
+class ExamScores(BaseModule):
+    def run(self):
+        scores = Utils.get_projects_users(self.api, 1301, user_id=[151426, 151690])
+        print(scores)
+        print("Please")
+
+
+class ProjectsStatus(BaseModule):
+    def run(self):
+        title = (
+            "Gets the current project status summary of Pisciners.\n"
+            "\n"
+            "Select your campus: "
+        )
+
+        campus = prompt_campus(title + "\n")
+        print(title + get_campus_name(campus))
+
+        year = prompt("Year of the Piscine: ", default=str(datetime.now().year))
+        month = month_prompt("Month of the Piscine")
+        print("Month of the Piscine: " + month.capitalize())
+
+        with Spinner("Fetching Pisciners"):
+            users = Utils.get_users(
+                self.api,
+                pool_year=year,
+                pool_month=month,
+                cursus_id=9,
+                primary_campus_id=campus,
+            )
+
+        if not len(users):
+            clear_terminal()
+            print(f"The {month} Piscine in {year} does not have any pisciners.")
+            return
+
+        with Spinner("Fetching Projects"):
+            projects = Utils.get_projects_users(
+                self.api, user_id=[user["id"] for user in users]
+            )
+
+            # Maybe there is a way to only get the Piscine projects in a nice way for now filtering it is.
+            projects = [project for project in projects if 9 in project["cursus_ids"]]
+
+        clear_terminal()
+
+        if not len(projects):
+            print(f"No projects could be found for the {month} Piscine in {year}.")
+            return
+
+        last_selection_index = 0
+        while True:
+            clear_terminal()
+
+            self.print_overview(users, projects)
+
+            menu = sorted(set([project["project"]["name"] for project in projects]))
+            menu.append("Go Back")
+            menu.append("Quit")
+
+            # Note to myself: cursor is not spelled curser
+            selection = prompt_select(menu, cursor_index=last_selection_index)
+            if selection == "Quit" or selection is None:
+                return InterfaceResult.Exit
+
+            if selection == "Go Back":
+                return InterfaceResult.Skip
+
+            last_selection_index = menu.index(selection)
+            result = self.print_project_overview(users, selection, projects)
+
+            if result == InterfaceResult.Exit:
+                return InterfaceResult.Exit
+
+    def print_overview(self, users, projects):
+        print(f"There are a total of {len(users)} Pisciners.\n")
+
+        project_statuses = {}
+        project_marks = {}
+        for project in projects:
+            project_name = project["project"]["name"]
+            status = project["status"]
+
+            if project_name not in project_statuses:
+                project_statuses[project_name] = {}
+
+            if status not in project_statuses[project_name]:
+                project_statuses[project_name][status] = 0
+
+            if project_name not in project_marks:
+                project_marks[project_name] = []
+
+            project_statuses[project_name][status] += 1
+
+            if project["final_mark"] is not None:
+                project_marks[project_name].append(project["final_mark"])
+
+        for project in sorted(project_statuses):
+            total_project_users = sum(project_statuses[project].values())
+            print(
+                f"{project} ({total_project_users} Pisciners - {total_project_users / len(users) * 100:.2f}%):"
+            )
+
+            average_mark = 0
+            if len(project_marks[project]):
+                average_mark = sum(project_marks[project]) / len(project_marks[project])
+
+            print(f"  Average Grade: {average_mark:.2f}")
+
+            for status in sorted(project_statuses[project]):
+                if status == "searching_a_group":
+                    pretty_status = "Searching For A Group"
+                elif status == "in_progress":
+                    pretty_status = "In Progress"
+                elif status == "waiting_for_correction":
+                    pretty_status = "Waiting For Evaluation"
+                elif status == "finished":
+                    pretty_status = "Finished"
+                else:
+                    pretty_status = status
+
+                count = project_statuses[project][status]
+                print(
+                    f"    {pretty_status}: {count} ({count / total_project_users * 100:.2f}%)",
+                )
+
+            print("")
+
+    def print_project_overview(self, users, project_name, projects):
+        clear_terminal()
+
+        projects = [
+            project
+            for project in projects
+            if project["project"]["name"] == project_name
+        ]
+
+        print(f"Overview of {project_name}")
+
+        total_project_users = len(projects)
+        statuses = {}
+        marks = []
+        average_mark = 0
+        total_tries = 0
+        for project in projects:
+            total_tries += len(project["teams"])
+
+            if len(project["teams"]) and project["teams"][-1]["final_mark"] is None:
+                total_tries -= 1
+
+            status = project["status"]
+            if status not in statuses:
+                statuses[status] = 0
+            statuses[status] += 1
+
+            if project["final_mark"] is None:
+                continue
+
+            marks.append(project["final_mark"])
+
+        if len(marks):
+            average_mark = sum(marks) / len(marks)
+
+        print(
+            f"Pisciners: {total_project_users} (out of {len(users)} - {total_project_users / len(users) * 100:.2f}%)"
+        )
+        print(f"Tries: {total_tries}")
+        print(f"Average Grade: {average_mark:.2f}")
+
+        for status in sorted(statuses):
+            if status == "searching_a_group":
+                pretty_status = "Searching For A Group"
+            elif status == "in_progress":
+                pretty_status = "In Progress"
+            elif status == "waiting_for_correction":
+                pretty_status = "Waiting For Evaluation"
+            elif status == "finished":
+                pretty_status = "Finished"
+            else:
+                pretty_status = status
+
+            count = statuses[status]
+            print(
+                f"{pretty_status}: {count} ({count / total_project_users * 100:.2f}%)",
+            )
+
+        print("\n")
+
+        for project in sorted(projects, key=lambda project: project["user"]["login"]):
+            print(
+                f'{project["user"]["login"]} {len(project["teams"]) - 1 if len(project["teams"]) else 0} {"try" if len(project["teams"]) == 2 else "tries"} Final Mark {project["final_mark"] if project["final_mark"] is not None else "None"}:'
+            )
+            if project["teams"]:
+                for team in project["teams"]:
+
+                    status = project["status"]
+                    if status == "searching_a_group":
+                        pretty_status = "Searching For A Group"
+                    elif status == "in_progress":
+                        pretty_status = "In Progress"
+                    elif status == "waiting_for_correction":
+                        pretty_status = "Waiting For Evaluation"
+                    elif status == "finished":
+                        pretty_status = "Finished"
+                    else:
+                        pretty_status = status
+
+                    print(
+                        f'    {team["name"]}: {team["final_mark"] if team["final_mark"] is not None else pretty_status}'
+                    )
+
+            if project["status"] == "searching_a_group":
+                print("Searching A Group")
+
+            print("")
+
+        selection = prompt_select(["Go Back", "Quit"])
+        if selection == "Quit" or selection is None:
+            return InterfaceResult.Exit
+
+        if selection == "Go Back":
+            return InterfaceResult.GoBack
 
 
 def month_prompt(title="Select a month") -> str:
@@ -76,6 +302,7 @@ def month_prompt(title="Select a month") -> str:
     month = prompt_select(
         months,
         title=title,
+        cursor_index=datetime.now().month - 1,
     )
 
     return month.lower()

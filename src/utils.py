@@ -111,9 +111,6 @@ class Utils:
             if not data:
                 break
 
-            with open("users.json", "w") as f:
-                json.dump(data, f, indent=4)
-
             users.extend(data)
 
             page += 1
@@ -179,6 +176,48 @@ class Utils:
             page += 1
 
         return teams
+
+    @staticmethod
+    def get_projects_users(
+        api: OAuth2Session,
+        project_id: Optional[int] = None,
+        campus_id: Optional[int] = None,
+        cursus_id: Optional[int] = None,
+        user_id: Optional[int | list[int]] = None,
+    ) -> list:
+        users = []
+
+        params: dict = {"per_page": 100}
+
+        if project_id is not None:
+            params["filter[project_id]"] = project_id
+
+        if campus_id is not None:
+            params["filter[campus_id]"] = campus_id
+
+        if cursus_id is not None:
+            params["filter[cursus]"] = cursus_id
+
+        if user_id is not None:
+            params["filter[user_id]"] = id_list_to_string(user_id)
+
+        page = 1
+        while True:
+            params["page"] = page
+
+            response = api.get(
+                f"https://api.intra.42.fr/v2/projects_users", params=params
+            )
+            data = response.json()
+
+            if not data:
+                break
+
+            users.extend(data)
+
+            page += 1
+
+        return users
 
     @staticmethod
     def make_request_with_backoff(
@@ -263,7 +302,8 @@ campuses = {
 
 def prompt_campus(title="Select your campus\n") -> int:
     options = sorted(campuses.keys())
-    campus = prompt_select(options, title=title)
+    # Promote 42 Vienna .-.
+    campus = prompt_select(options, title=title, cursor_index=options.index("Vienna"))
 
     return campuses[campus]
 
@@ -273,3 +313,12 @@ def get_campus_name(campus_id: int) -> str:
         if id == campus_id:
             return name
     return "Unknown"
+
+
+def id_list_to_string(ids: int | list[int]):
+    if isinstance(ids, int):
+        return ids
+    if isinstance(ids, list):
+        return ",".join(map(str, ids))
+
+    raise TypeError("ids must either be an int or a list of ints")
