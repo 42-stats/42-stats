@@ -5,6 +5,18 @@ from src.utils import Utils, clear_terminal, prompt
 
 
 class EvaluatorScore(BaseModule):
+    """
+    A class representing the evaluator score module.
+
+    This module fetches evaluations involving a specific user as a corrector,
+    calculates the average final mark, and returns the result.
+
+    Attributes:
+        api (API): The API object used for making API requests.
+
+    Methods:
+        run: Runs the evaluator score module and returns the result.
+    """
 
     def run(self) -> str:
         login = prompt("login: ")
