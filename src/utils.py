@@ -78,9 +78,48 @@ class Utils:
         return users
 
     @staticmethod
+    def get_exams(
+        api: OAuth2Session,
+        campus_id: Optional[str | int] = None,
+        future: Optional[bool] = None,
+        visible: Optional[bool] = None,
+    ):
+        exams = []
+        page = 1
+        params: dict = {"per_page": 100}
+
+        if campus_id is not None:
+            params["filter[campus_id]"] = campus_id
+
+        if future is not None:
+            params["filter[future]"] = "true" if future else "false"
+
+        if visible is not None:
+            params["filter[visible]"] = "true" if visible else "false"
+
+        while True:
+            params["page"] = page
+
+            response = api.get(f"https://api.intra.42.fr/v2/exams", params=params)
+            data = response.json()
+
+            if not data:
+                break
+
+            exams.extend(data)
+
+            if len(data) < 100:
+                break
+
+            page += 1
+
+        return exams
+
+    @staticmethod
     def get_users(
         api: OAuth2Session,
         cursus_id: Optional[str | int] = None,
+        project_id: Optional[int] = None,
         pool_year: Optional[str | int] = None,
         pool_month: Optional[str | int] = None,
         primary_campus_id: Optional[str | int] = None,
@@ -91,6 +130,9 @@ class Utils:
 
         if cursus_id is not None:
             params["cursus_id"] = cursus_id
+
+        if project_id is not None:
+            params["project_id"] = project_id
 
         if pool_year is not None:
             params["filter[pool_year]"] = pool_year
@@ -112,6 +154,9 @@ class Utils:
                 break
 
             users.extend(data)
+
+            if len(data) < 100:
+                break
 
             page += 1
 
@@ -214,6 +259,9 @@ class Utils:
                 break
 
             users.extend(data)
+
+            if len(data) < 100:
+                break
 
             page += 1
 

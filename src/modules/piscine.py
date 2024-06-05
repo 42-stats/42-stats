@@ -18,7 +18,7 @@ class Piscine(BaseModule):
     def run(self) -> InterfaceResult:
         modules = {
             "Accepted Pisciners": AcceptedPisciners(self.api),
-            "Pisciners not correctly subscribed to the Exam": ExamScores(self.api),
+            "Pisciners not correctly subscribed to the Exam": ExamImpostors(self.api),
             "Projects Status": ProjectsStatus(self.api),
         }
 
@@ -60,11 +60,75 @@ class AcceptedPisciners(BaseModule):
         print(f"\nTotal: {len(users)}\n")
 
 
-class ExamScores(BaseModule):
+class ExamImpostors(BaseModule):
     def run(self):
-        scores = Utils.get_projects_users(self.api, 1301, user_id=[151426, 151690])
-        print(scores)
-        print("Please")
+        title = (
+            "Gets the current project status summary of Pisciners.\n"
+            "\n"
+            "Select your campus: "
+        )
+
+        campus = prompt_campus(title + "\n")
+        print(title + get_campus_name(campus))
+
+        # year = prompt("Year of the Piscine: ", default=str(datetime.now().year))
+        # month = month_prompt("Month of the Piscine")
+        # print("Month of the Piscine: " + month.capitalize())
+        year = datetime.now().year
+
+        month = [
+            "january",
+            "february",
+            "march",
+            "april",
+            "may",
+            "june",
+            "july",
+            "august",
+            "september",
+            "october",
+            "november",
+            "december",
+        ][datetime.now().month - 1]
+
+        with Spinner("Fetching Exams"):
+            exams = Utils.get_exams(
+                self.api, campus_id=campus, future=True, visible=True
+            )
+
+            if not len(exams):
+                clear_terminal()
+                print("No Exam found")
+                return InterfaceResult.Success
+
+        exams = [exam for exam in exams if "Piscine" in exam["name"]]
+
+        if len(exams) > 1:
+            exams_list = [exam["name"] for exam in exams]
+            selection = prompt_select(exams_list)
+            if not selection:
+                return InterfaceResult.Success
+
+            exam = exams[exams_list.index(selection)]
+        else:
+            exam = exams[0]
+
+        with Spinner("Fetching Project Users"):
+            project_users = Utils.get_users(
+                self.api,
+                project_id=exam["projects"][0]["id"],
+                primary_campus_id=campus,
+                pool_year=year,
+                pool_month=month,
+            )
+
+        # clear_terminal()
+
+        print(f'Information for {exam["name"]}')
+        print("")
+        print(f'Registered to Event: {exam["nbr_subscribers"]}')
+        print(f"Registered to Project: {len(project_users)}")
+        print(f'Difference: {abs(exam["nbr_subscribers"] - len(project_users))}')
 
 
 class ProjectsStatus(BaseModule):
