@@ -8,8 +8,18 @@ import os
 
 
 class FriendsEval(BaseModule):
+    """A class that performs evaluation network analysis for a user"""
 
     def get_top_10(self, login_counts: dict, user_login: str) -> str:
+        """Get the top 10 most interacted with users.
+
+        Args:
+            login_counts (dict): A dictionary containing the login counts of friends.
+            user_login (str): The login of the user.
+
+        Returns:
+            str: A string containing the top 10 most interacted with friends.
+        """
         sorted_counts = sorted(login_counts.items(), key=lambda x: x[1], reverse=True)
         top_10 = []
         for i in range(min(10, len(sorted_counts))):
@@ -22,6 +32,17 @@ class FriendsEval(BaseModule):
     def append_sorted_counts_to_lines(
         self, sorted_counts, total_lines, entries_per_line, total_entries
     ) -> str:
+        """Append sorted counts to lines for formatting.
+
+        Args:
+            sorted_counts: A list of sorted counts.
+            total_lines: The total number of lines.
+            entries_per_line: The number of entries per line.
+            total_entries: The total number of entries.
+
+        Returns:
+            str: A string containing the formatted lines.
+        """
         formatted_lines = []
         for line in range(total_lines):
             line_entries = []
@@ -38,6 +59,16 @@ class FriendsEval(BaseModule):
     def format_result(
         self, login_counts: dict, user_login: str, entries_per_line=6
     ) -> str:
+        """Format the result of the evaluation network analysis.
+
+        Args:
+            login_counts (dict): A dictionary containing the login counts of friends.
+            user_login (str): The login of the user.
+            entries_per_line (int, optional): The number of entries per line. Defaults to 6.
+
+        Returns:
+            str: A string containing the formatted result.
+        """
         sorted_counts = sorted(login_counts.items(), key=lambda x: x[1], reverse=True)
         total_entries = len(sorted_counts)
         total_lines = (total_entries + entries_per_line - 1) // entries_per_line
@@ -53,6 +84,15 @@ class FriendsEval(BaseModule):
     def count_logins(
         self, as_corrected_df: pd.DataFrame, as_corrector_df: pd.DataFrame
     ) -> Counter:
+        """Count the logins of users.
+
+        Args:
+            as_corrected_df (pd.DataFrame): A DataFrame containing evaluations where the user is corrected.
+            as_corrector_df (pd.DataFrame): A DataFrame containing evaluations where the user is the corrector.
+
+        Returns:
+            Counter: A Counter object containing the login counts of users.
+        """
         corrected_logins = [
             d["login"] for d in as_corrected_df["corrector"] if "login" in d
         ]
@@ -63,6 +103,15 @@ class FriendsEval(BaseModule):
         return Counter(logins)
 
     def show_formatted_result(self, login_counts, login):
+        """Show the formatted result of the evaluation network analysis.
+
+        Args:
+            login_counts: A Counter object containing the login counts of users.
+            login: The login of the user.
+
+        Returns:
+            InterfaceResult: The result of the interface.
+        """
         os.system("clear")
         print(self.get_top_10(login_counts, login))
         if prompt_select(["get full list", "go back"]) == "go back":
@@ -74,6 +123,11 @@ class FriendsEval(BaseModule):
         return InterfaceResult.Success
 
     def run(self) -> str:
+        """Run the evaluation network analysis.
+
+        Returns:
+            str: The result of the evaluation network analysis.
+        """
         login = prompt("Login: ")
 
         with Spinner(f"Fetching all evaluations involving {login}") as spinner:

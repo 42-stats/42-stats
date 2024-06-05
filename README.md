@@ -1,4 +1,4 @@
-# <p align="center">42 Stats </p>
+# 42-Stats
   
 The 42 Stats CLI is a command-line tool designed for 42 students. It allows users to easily access and analyze various statistics related to their curriculum.
 ## 🧐 Features    

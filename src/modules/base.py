@@ -1,4 +1,3 @@
-from simple_term_menu import TerminalMenu
 import logging
 
 from src.InterfaceResult import InterfaceResult

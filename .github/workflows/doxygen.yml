@@ -1,0 +1,31 @@
+name: Generate and Deploy Doxygen Documentation
+
+on: 
+  push: 
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Set up Doxygen
+        run: sudo apt-get install doxygen
+
+      - name: Generate Doxygen Documentation
+        run: doxygen Doxyfile
+
+      - name: Create .nojekyll File
+        run: touch ./docs/html/.nojekyll
+
+      - name: Deploy to GitHub Pages
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          branch: gh-pages
+          folder: ./docs/html
+          token: ${{ secrets.GITHUB_TOKEN }}
