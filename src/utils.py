@@ -161,7 +161,7 @@ class Utils:
             evaluations.extend(data)
             page += 1
 
-        with open("evals.json", "w") as f:
+        with open(f"{side}.json", "w") as f:
             json.dump(evaluations, f, indent=4)
         df = pd.DataFrame(evaluations)
         return df
