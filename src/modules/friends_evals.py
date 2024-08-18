@@ -10,24 +10,49 @@ import os
 class FriendsEval(BaseModule):
     """A class that performs evaluation network analysis for a user"""
 
-    def get_top_10(self, login_counts: dict, user_login: str) -> str:
-        """Get the top 10 most interacted with users.
+    def get_top_10(self, corrected: dict, corrector: dict, user_login: str) -> str:
+        """Get the top 10 most interacted with users as corrector, corrected and combined.
 
         Args:
-            login_counts (dict): A dictionary containing the login counts of friends.
+            corrected (dict): The first dictionary containing login counts.
+            corrector (dict): The second dictionary containing login counts.
             user_login (str): The login of the user.
 
         Returns:
-            str: A string containing the top 10 most interacted with friends.
+            str: A string containing the top 10 most interacted with friends as corrector, corrected and combined.
         """
-        sorted_counts = sorted(login_counts.items(), key=lambda x: x[1], reverse=True)
-        top_10 = []
-        for i in range(min(10, len(sorted_counts))):
-            login, count = sorted_counts[i]
-            top_10.append(f"{login}: {count}")
-        result_string = f"Evaluation Network Analysis for {user_login} - Top 10 Most Interacted With:\n\n"
-        result_string += "\n".join(top_10)
+
+        sorted_counts1 = sorted(corrected.items(), key=lambda x: x[1], reverse=True)[:10]
+        sorted_counts2 = sorted(corrector.items(), key=lambda x: x[1], reverse=True)[:10]
+
+        combined_dict = dict(corrected)
+        for login, count in corrector.items():
+            if login in combined_dict:
+                combined_dict[login] += count
+            else:
+                combined_dict[login] = count
+
+        sorted_combined_counts = sorted(combined_dict.items(), key=lambda x: x[1], reverse=True)[:10]
+
+        column_width = 20
+        
+        top_10_lines = []
+        for i in range(max(len(sorted_counts1), len(sorted_counts2))):
+            login1, count1 = sorted_counts1[i] if i < len(sorted_counts1) else ("", "")
+            login2, count2 = sorted_counts2[i] if i < len(sorted_counts2) else ("", "")
+            login3, count3 = sorted_combined_counts[i] if i < len(sorted_combined_counts) else ("", "")
+
+            line = (f"{login1: <{column_width}} {count1: <10} | "
+                    f"{login2: <{column_width}} {count2: <10} | "
+                    f"{login3: <{column_width}} {count3: <10}")
+            top_10_lines.append(line)
+
+        result_string = (f"Evaluation Network Analysis for {user_login} - Top 10 Most Interacted With:\n\n"
+                        f"Corrected (Top 10)        | Corrector (Top 10)        | Combined (Top 10)\n"
+                        f"{'-' * (3 * column_width + 20)}\n")
+        result_string += "\n".join(top_10_lines)
         return result_string + "\n"
+
 
     def append_sorted_counts_to_lines(
         self, sorted_counts, total_lines, entries_per_line, total_entries
@@ -57,7 +82,7 @@ class FriendsEval(BaseModule):
         return "\n".join(formatted_lines)
 
     def format_result(
-        self, login_counts: dict, user_login: str, entries_per_line=6
+        self, corrected_counter: dict, corrector_counter: dict, user_login: str, entries_per_line=6
     ) -> str:
         """Format the result of the evaluation network analysis.
 
@@ -69,40 +94,63 @@ class FriendsEval(BaseModule):
         Returns:
             str: A string containing the formatted result.
         """
-        sorted_counts = sorted(login_counts.items(), key=lambda x: x[1], reverse=True)
-        total_entries = len(sorted_counts)
-        total_lines = (total_entries + entries_per_line - 1) // entries_per_line
-        formatted_lines = self.append_sorted_counts_to_lines(
-            sorted_counts, total_lines, entries_per_line, total_entries
+        corrector_sorted_counts = sorted(corrector_counter.items(), key=lambda x: x[1], reverse=True)
+        corrected_sorted_counts = sorted(corrected_counter.items(), key=lambda x: x[1], reverse=True)
+        
+        corrector_total_entries = len(corrector_sorted_counts) 
+        corrected_total_entries = len(corrected_sorted_counts)
+
+        corrector_total_lines = (corrector_total_entries + entries_per_line - 1) // entries_per_line
+        corrected_total_lines = (corrected_total_entries + entries_per_line - 1)
+        
+        corrector_formatted_lines = self.append_sorted_counts_to_lines(
+            corrector_sorted_counts, corrector_total_lines, entries_per_line, corrector_total_entries
         )
+        corrected_formatted_lines += self.append_sorted_counts_to_lines(
+            corrected_sorted_counts, corrected_total_lines, entries_per_line, corrected_total_entries
+        )
+
 
         result_string = (
-            f"Full Evaluation Network Analysis for {user_login}:\n\n{formatted_lines}\n"
-        )
+                f"Full Evaluation Network Analysis for {user_login}:\n\n"
+                f"Corrector:\n{corrector_formatted_lines}\n\n"
+                f"Corrected:\n{corrected_formatted_lines}\n"
+            )
         return result_string
 
-    def count_logins(
-        self, as_corrected_df: pd.DataFrame, as_corrector_df: pd.DataFrame
-    ) -> Counter:
-        """Count the logins of users.
+    def count_corrector_logins(self, as_corrector_df: pd.DataFrame) -> Counter:
+        """
+        Count the logins of users where the user is the corrector.
 
         Args:
-            as_corrected_df (pd.DataFrame): A DataFrame containing evaluations where the user is corrected.
             as_corrector_df (pd.DataFrame): A DataFrame containing evaluations where the user is the corrector.
 
         Returns:
-            Counter: A Counter object containing the login counts of users.
+            Counter: A Counter object containing the login counts of users where the user is the corrector.
+        """
+        corrector_logins = [
+            d["login"] for d in as_corrector_df["correcteds"].explode() if isinstance(d, dict) and "login" in d
+        ]
+        return Counter(corrector_logins)
+    
+
+    def count_corrected_logins(self, as_corrected_df: pd.DataFrame) -> Counter:
+        """
+        Count the logins of users where the user is corrected.
+
+        Args:
+            as_corrected_df (pd.DataFrame): A DataFrame containing evaluations where the user is corrected.
+
+        Returns:
+            Counter: A Counter object containing the login counts of users where the user is corrected.
         """
         corrected_logins = [
-            d["login"] for d in as_corrected_df["corrector"] if "login" in d
+            d["login"] for d in as_corrected_df["corrector"] if isinstance(d, dict) and "login" in d
         ]
-        corrector_logins = [
-            d["login"] for d in as_corrector_df["correcteds"].explode() if "login" in d
-        ]
-        logins = list(corrected_logins + corrector_logins)
-        return Counter(logins)
+        return Counter(corrected_logins)
 
-    def show_formatted_result(self, login_counts, login):
+
+    def show_formatted_result(self, corrected_counter, corrector_counter, login):
         """Show the formatted result of the evaluation network analysis.
 
         Args:
@@ -113,13 +161,13 @@ class FriendsEval(BaseModule):
             InterfaceResult: The result of the interface.
         """
         os.system("clear")
-        print(self.get_top_10(login_counts, login))
+        print(self.get_top_10(corrected_counter, corrector_counter, login))
         if prompt_select(["get full list", "go back"]) == "go back":
             clear_terminal()
             return InterfaceResult.Skip
 
         clear_terminal()
-        print(self.format_result(login_counts, login))
+        print(self.format_result(corrected_counter, corrector_counter, login))
         return InterfaceResult.Success
 
     def run(self) -> str:
@@ -139,9 +187,10 @@ class FriendsEval(BaseModule):
                 as_corrector_df = Utils.get_evaluations_for_user(
                     self.api, user_id, side="as_corrector", spinner=spinner
                 )
-                login_counts = self.count_logins(as_corrected_df, as_corrector_df)
+                corrected_counter = self.count_corrected_logins(as_corrected_df)
+                corrector_counter = self.count_corrector_logins(as_corrector_df)
 
             except Exception as e:
                 raise Exception(f"An error occurred: {e}")
 
-        return self.show_formatted_result(login_counts, login)
+        return self.show_formatted_result(corrected_counter, corrector_counter, login)
