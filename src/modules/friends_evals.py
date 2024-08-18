@@ -10,50 +10,6 @@ import os
 class FriendsEval(BaseModule):
     """A class that performs evaluation network analysis for a user"""
 
-    def get_top_10(self, corrected: dict, corrector: dict, user_login: str) -> str:
-        """Get the top 10 most interacted with users as corrector, corrected and combined.
-
-        Args:
-            corrected (dict): The first dictionary containing login counts.
-            corrector (dict): The second dictionary containing login counts.
-            user_login (str): The login of the user.
-
-        Returns:
-            str: A string containing the top 10 most interacted with friends as corrector, corrected and combined.
-        """
-
-        sorted_counts1 = sorted(corrected.items(), key=lambda x: x[1], reverse=True)[:10]
-        sorted_counts2 = sorted(corrector.items(), key=lambda x: x[1], reverse=True)[:10]
-
-        combined_dict = dict(corrected)
-        for login, count in corrector.items():
-            if login in combined_dict:
-                combined_dict[login] += count
-            else:
-                combined_dict[login] = count
-
-        sorted_combined_counts = sorted(combined_dict.items(), key=lambda x: x[1], reverse=True)[:10]
-
-        column_width = 20
-        
-        top_10_lines = []
-        for i in range(max(len(sorted_counts1), len(sorted_counts2))):
-            login1, count1 = sorted_counts1[i] if i < len(sorted_counts1) else ("", "")
-            login2, count2 = sorted_counts2[i] if i < len(sorted_counts2) else ("", "")
-            login3, count3 = sorted_combined_counts[i] if i < len(sorted_combined_counts) else ("", "")
-
-            line = (f"{login1: <{column_width}} {count1: <10} | "
-                    f"{login2: <{column_width}} {count2: <10} | "
-                    f"{login3: <{column_width}} {count3: <10}")
-            top_10_lines.append(line)
-
-        result_string = (f"Evaluation Network Analysis for {user_login} - Top 10 Most Interacted With:\n\n"
-                        f"Corrected (Top 10)        | Corrector (Top 10)        | Combined (Top 10)\n"
-                        f"{'-' * (3 * column_width + 20)}\n")
-        result_string += "\n".join(top_10_lines)
-        return result_string + "\n"
-
-
     def append_sorted_counts_to_lines(
         self, sorted_counts, total_lines, entries_per_line, total_entries
     ) -> str:
@@ -82,7 +38,7 @@ class FriendsEval(BaseModule):
         return "\n".join(formatted_lines)
 
     def format_result(
-        self, corrected_counter: dict, corrector_counter: dict, user_login: str, entries_per_line=6
+        self, corrected: dict, corrector: dict, user_login: str, top_n=None
     ) -> str:
         """Format the result of the evaluation network analysis.
 
@@ -94,29 +50,36 @@ class FriendsEval(BaseModule):
         Returns:
             str: A string containing the formatted result.
         """
-        corrector_sorted_counts = sorted(corrector_counter.items(), key=lambda x: x[1], reverse=True)
-        corrected_sorted_counts = sorted(corrected_counter.items(), key=lambda x: x[1], reverse=True)
+        sorted_counts1 = sorted(corrected.items(), key=lambda x: x[1], reverse=True)[:top_n]
+        sorted_counts2 = sorted(corrector.items(), key=lambda x: x[1], reverse=True)[:top_n]
+
+        combined_dict = dict(corrected)
+        for login, count in corrector.items():
+            if login in combined_dict:
+                combined_dict[login] += count
+            else:
+                combined_dict[login] = count
+
+        sorted_combined_counts = sorted(combined_dict.items(), key=lambda x: x[1], reverse=True)
+
+        column_width = 20
         
-        corrector_total_entries = len(corrector_sorted_counts) 
-        corrected_total_entries = len(corrected_sorted_counts)
+        top_10_lines = []
+        for i in range(max(len(sorted_counts1), len(sorted_counts2))):
+            login1, count1 = sorted_counts1[i] if i < len(sorted_counts1) else ("", "")
+            login2, count2 = sorted_counts2[i] if i < len(sorted_counts2) else ("", "")
+            login3, count3 = sorted_combined_counts[i] if i < len(sorted_combined_counts) else ("", "")
 
-        corrector_total_lines = (corrector_total_entries + entries_per_line - 1) // entries_per_line
-        corrected_total_lines = (corrected_total_entries + entries_per_line - 1)
-        
-        corrector_formatted_lines = self.append_sorted_counts_to_lines(
-            corrector_sorted_counts, corrector_total_lines, entries_per_line, corrector_total_entries
-        )
-        corrected_formatted_lines += self.append_sorted_counts_to_lines(
-            corrected_sorted_counts, corrected_total_lines, entries_per_line, corrected_total_entries
-        )
+            line = (f"{login1: <{column_width}} {count1: <10} | "
+                    f"{login2: <{column_width}} {count2: <10} | "
+                    f"{login3: <{column_width}} {count3: <10}")
+            top_10_lines.append(line)
 
-
-        result_string = (
-                f"Full Evaluation Network Analysis for {user_login}:\n\n"
-                f"Corrector:\n{corrector_formatted_lines}\n\n"
-                f"Corrected:\n{corrected_formatted_lines}\n"
-            )
-        return result_string
+        result_string = (f"Evaluation Network Analysis for {user_login} - Top Most Interacted With:\n\n"
+                        f"Corrected (They evaluated you)  | Corrector (You evaluated them)  | Combined\n"
+                        f"{'-' * (3 * column_width + 20)}\n")
+        result_string += "\n".join(top_10_lines)
+        return result_string + "\n"
 
     def count_corrector_logins(self, as_corrector_df: pd.DataFrame) -> Counter:
         """
@@ -161,7 +124,7 @@ class FriendsEval(BaseModule):
             InterfaceResult: The result of the interface.
         """
         os.system("clear")
-        print(self.get_top_10(corrected_counter, corrector_counter, login))
+        print(self.format_result(corrected_counter, corrector_counter, login, 10))
         if prompt_select(["get full list", "go back"]) == "go back":
             clear_terminal()
             return InterfaceResult.Skip
