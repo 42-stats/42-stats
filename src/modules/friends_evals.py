@@ -14,24 +14,25 @@ class FriendsEval(BaseModule):
     """
     A class that performs evaluation network analysis for a user.
 
-    This class provides methods to process and format data related to user interactions 
-    in an evaluation network, showing statistics about how often users evaluate each other 
+    This class provides methods to process and format data related to user interactions
+    in an evaluation network, showing statistics about how often users evaluate each other
     and their average evaluation scores.
     """
+
     def format_result(
         self, corrected: dict, corrector: dict, user_login: str, top_n=None
     ) -> str:
         """
         Format the result of the evaluation network analysis.
 
-        This method combines and formats the corrected and corrector data to provide a 
-        comprehensive view of the user's interactions, displaying top results based on 
+        This method combines and formats the corrected and corrector data to provide a
+        comprehensive view of the user's interactions, displaying top results based on
         the frequency of interactions and average scores.
 
         Args:
-            corrected (dict): A dictionary containing data on how many times each user 
+            corrected (dict): A dictionary containing data on how many times each user
                               has been corrected and their average scores.
-            corrector (dict): A dictionary containing data on how many times each user 
+            corrector (dict): A dictionary containing data on how many times each user
                               has corrected others and their average scores.
             user_login (str): The login of the user for whom the analysis is being performed.
             top_n (int, optional): The number of top results to display. Defaults to showing all.
@@ -109,18 +110,18 @@ class FriendsEval(BaseModule):
         """
         Show the formatted result of the evaluation network analysis.
 
-        This method clears the terminal, displays the top results of the evaluation network 
+        This method clears the terminal, displays the top results of the evaluation network
         analysis, and provides an option for the user to view the full list or go back.
 
         Args:
-            corrected_counter (dict): A dictionary containing the corrected data, with user 
+            corrected_counter (dict): A dictionary containing the corrected data, with user
                                       logins as keys and tuples of counts and average scores as values.
-            corrector_counter (dict): A dictionary containing the corrector data, with user 
+            corrector_counter (dict): A dictionary containing the corrector data, with user
                                       logins as keys and tuples of counts and average scores as values.
             login (str): The login of the user for whom the analysis is being displayed.
 
         Returns:
-            InterfaceResult: The result of the interface action, either `InterfaceResult.Skip` 
+            InterfaceResult: The result of the interface action, either `InterfaceResult.Skip`
                              or `InterfaceResult.Success` depending on user interaction.
         """
         os.system("clear")
@@ -137,12 +138,12 @@ class FriendsEval(BaseModule):
         """
         Process data where the user acted as a corrector.
 
-        This method takes a DataFrame of evaluations where the user was the corrector, 
-        aggregates the number of corrections and average scores for each corrected user, 
+        This method takes a DataFrame of evaluations where the user was the corrector,
+        aggregates the number of corrections and average scores for each corrected user,
         and returns this data as a dictionary.
 
         Args:
-            as_corrector_df (pd.DataFrame): A pandas DataFrame containing data of evaluations 
+            as_corrector_df (pd.DataFrame): A pandas DataFrame containing data of evaluations
                                             where the user acted as the corrector.
 
         Returns:
@@ -174,12 +175,12 @@ class FriendsEval(BaseModule):
         """
         Process data where the user was corrected by others.
 
-        This method takes a DataFrame of evaluations where the user was corrected, 
-        aggregates the number of times they were corrected and the average scores given by each corrector, 
+        This method takes a DataFrame of evaluations where the user was corrected,
+        aggregates the number of times they were corrected and the average scores given by each corrector,
         and returns this data as a dictionary.
 
         Args:
-            as_corrected_df (pd.DataFrame): A pandas DataFrame containing data of evaluations 
+            as_corrected_df (pd.DataFrame): A pandas DataFrame containing data of evaluations
                                             where the user was corrected by others.
 
         Returns:
@@ -210,7 +211,7 @@ class FriendsEval(BaseModule):
         """
         Run the evaluation network analysis for a specified user.
 
-        This method prompts the user for their login, fetches the necessary evaluation data 
+        This method prompts the user for their login, fetches the necessary evaluation data
         for the user, processes this data, and displays the formatted results.
 
         Returns:
