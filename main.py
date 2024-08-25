@@ -3,6 +3,7 @@ from src.modules.evaluator_score import EvaluatorScore
 from src.modules.feature_request import FeatureRequest
 from src.modules.friends_evals import FriendsEval
 from src.modules.odds_of_failing import OddsOfFailing
+from src.modules.piscine import Piscine
 from src.request import Request
 
 
@@ -18,10 +19,11 @@ def main():
         api = request.api
 
         modules = {
-            "average score as an evaluator": EvaluatorScore(api),
-            "odds of failing next project": OddsOfFailing(api),
-            "evaluation network analysis": FriendsEval(api),
-            "i have another question": FeatureRequest(api),
+            "Average score as an evaluator": EvaluatorScore(api),
+            "Odds of failing next project": OddsOfFailing(api),
+            "Evaluation network analysis": FriendsEval(api),
+            "I have another question": FeatureRequest(api),
+            "Piscine": Piscine(api),
         }
 
         interface = Interface("What would you like to know?", modules)

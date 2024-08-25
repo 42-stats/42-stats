@@ -16,6 +16,10 @@ def clear_terminal():
     os.system("cls" if os.name == "nt" else "clear")
 
 
+def clear_last_line():
+    print("\033[A\033[K", end="")
+
+
 def prompt(message: str):
     """
     Prompts the user for input with the given message.
@@ -99,6 +103,91 @@ class Utils:
         with open("users.txt", "w") as users_txt:
             for user in users:
                 users_txt.write(user + "\n")
+
+        return users
+
+    @staticmethod
+    def get_exams(
+        api: OAuth2Session,
+        campus_id: Optional[str | int] = None,
+        future: Optional[bool] = None,
+        visible: Optional[bool] = None,
+    ):
+        exams = []
+        page = 1
+        params: dict = {"per_page": 100}
+
+        if campus_id is not None:
+            params["filter[campus_id]"] = campus_id
+
+        if future is not None:
+            params["filter[future]"] = "true" if future else "false"
+
+        if visible is not None:
+            params["filter[visible]"] = "true" if visible else "false"
+
+        while True:
+            params["page"] = page
+
+            response = api.get(f"https://api.intra.42.fr/v2/exams", params=params)
+            data = response.json()
+
+            if not data:
+                break
+
+            exams.extend(data)
+
+            if len(data) < 100:
+                break
+
+            page += 1
+
+        return exams
+
+    @staticmethod
+    def get_users(
+        api: OAuth2Session,
+        cursus_id: Optional[str | int] = None,
+        project_id: Optional[int] = None,
+        pool_year: Optional[str | int] = None,
+        pool_month: Optional[str | int] = None,
+        primary_campus_id: Optional[str | int] = None,
+    ) -> list:
+        users = []
+
+        params = {"per_page": 100}
+
+        if cursus_id is not None:
+            params["cursus_id"] = cursus_id
+
+        if project_id is not None:
+            params["project_id"] = project_id
+
+        if pool_year is not None:
+            params["filter[pool_year]"] = pool_year
+
+        if pool_month is not None:
+            params["filter[pool_month]"] = pool_month
+
+        if primary_campus_id is not None:
+            params["filter[primary_campus_id]"] = primary_campus_id
+
+        page = 1
+        while True:
+            params["page"] = page
+
+            response = api.get("https://api.intra.42.fr/v2/users", params=params)
+            data = response.json()
+
+            if not data:
+                break
+
+            users.extend(data)
+
+            if len(data) < 100:
+                break
+
+            page += 1
 
         return users
 
@@ -198,6 +287,51 @@ class Utils:
         return teams
 
     @staticmethod
+    def get_projects_users(
+        api: OAuth2Session,
+        project_id: Optional[int] = None,
+        campus_id: Optional[int] = None,
+        cursus_id: Optional[int] = None,
+        user_id: Optional[int | list[int]] = None,
+    ) -> list:
+        users = []
+
+        params: dict = {"per_page": 100}
+
+        if project_id is not None:
+            params["filter[project_id]"] = project_id
+
+        if campus_id is not None:
+            params["filter[campus_id]"] = campus_id
+
+        if cursus_id is not None:
+            params["filter[cursus]"] = cursus_id
+
+        if user_id is not None:
+            params["filter[user_id]"] = id_list_to_string(user_id)
+
+        page = 1
+        while True:
+            params["page"] = page
+
+            response = api.get(
+                f"https://api.intra.42.fr/v2/projects_users", params=params
+            )
+            data = response.json()
+
+            if not data:
+                break
+
+            users.extend(data)
+
+            if len(data) < 100:
+                break
+
+            page += 1
+
+        return users
+
+    @staticmethod
     def make_request_with_backoff(
         api: OAuth2Session,
         url: str,
@@ -236,3 +370,83 @@ class Utils:
             else:
                 return response
         raise Exception(f"Request {url} failed after max retries")
+
+
+campuses = {
+    "Paris": 1,
+    "Lyon": 9,
+    "Nineteen": 12,
+    "Helsinki": 13,
+    "Amsterdam": 14,
+    "Khouribga": 16,
+    "Sao_paulo": 20,
+    "Benguerir": 21,
+    "Madrid": 22,
+    "Quebec": 25,
+    "Tokyo": 26,
+    "Rio De Janeiro": 28,
+    "Seoul": 29,
+    "Rome": 30,
+    "Angouleme": 31,
+    "Yerevan": 32,
+    "Bangkok": 33,
+    "Kuala Lumpur": 34,
+    "Amman": 35,
+    "Adelaide": 36,
+    "Malaga": 37,
+    "Lisboa": 38,
+    "Heilbronn": 39,
+    "Urduliz": 40,
+    "Nice": 41,
+    "Abu Dhabi": 43,
+    "Wolfsburg": 44,
+    "Alicante": 45,
+    "Barcelona": 46,
+    "Lausanne": 47,
+    "Mulhouse": 48,
+    "Istanbul": 49,
+    "Kocaeli": 50,
+    "Berlin": 51,
+    "Florence": 52,
+    "Vienna": 53,
+    "Tétouan": 55,
+    "Prague": 56,
+    "London": 57,
+    "Porto": 58,
+    "Luxembourg": 59,
+    "Perpignan": 60,
+    "Belo Horizonte": 61,
+    "Le Havre": 62,
+    "Singapore": 64,
+    "Antananarivo": 65,
+    "Warsaw": 67,
+    "Luanda": 68,
+    "Gyeongsan": 69,
+    "Nablus": 70,
+    "Beirut": 71,
+    "Milano": 72,
+}
+
+
+def prompt_campus(title="Select your campus\n") -> int:
+    options = sorted(campuses.keys())
+    # Promote 42 Vienna .-.
+    campus = prompt_select(options, title=title, cursor_index=options.index("Vienna"))
+
+    return campuses[campus]
+
+
+def get_campus_name(campus_id: int) -> str:
+    for name, id in campuses.items():
+        if id == campus_id:
+            return name
+    return "Unknown"
+
+
+def id_list_to_string(ids: int | list[int]):
+    if isinstance(ids, int):
+        return ids
+    if isinstance(ids, list):
+        return ",".join(map(str, ids))
+
+    raise TypeError("ids must either be an int or a list of ints")
